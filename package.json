@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@types/node": "^13.7.0",
+    "aws-serverless-express": "^3.3.6",
+    "express": "^4.17.1",
+    "knex": "^0.20.8",
+    "mysql": "^2.18.1"
+  }
+}
