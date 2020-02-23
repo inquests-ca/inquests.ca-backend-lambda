@@ -1,0 +1,13 @@
+const dbconfig = {
+    client: 'mysql',
+    version: '5.7', // TODO: confirm version
+    debug: true,
+    connection: {
+      host: '127.0.0.1',
+      user: 'root',
+      database: 'inquestsca'
+    },
+    pool: { min: 1, max: 1 }
+  };
+
+export default dbconfig;
