@@ -32,12 +32,10 @@ app.get('/inquests', async (req, res) => {
         // Ordering... TODO
     } = req.query;
 
-    const keywordsParsed = keyword && keyword
-        .map(keywordId => parseInt(keywordId))
-        .filter(keywordId => keywordId !== NaN);
+    // TODO: create limit, offset default consts.
     const limitParsed = parseInt(limit) >= 0 ? parseInt(limit) : 50;
     const offsetParsed = parseInt(offset) >= 0 ? parseInt(offset) : 0;
-    const inquests = await getInquests(keywordsParsed, limitParsed, offsetParsed);
+    const inquests = await getInquests(keyword, limitParsed, offsetParsed);
     res.json(inquests);
 })
 

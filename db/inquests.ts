@@ -8,10 +8,12 @@ export const getInquestById = (inquestId: number): Promise<Inquest> => {
         .where({ inquestId });
 }
 
-export const getInquests = (keywords, limit, offset): Promise<Array<Inquest>> => {
+export const getInquests = (keywords: Array<String>, limit: number, offset: number): Promise<Array<Inquest>> => {
     const query = knex
         .select('inquest.*')
-        .from('inquest');
+        .from('inquest')
+        .limit(limit)
+        .offset(offset);
     if (keywords !== undefined)
         query
             .innerJoin(
@@ -20,12 +22,9 @@ export const getInquests = (keywords, limit, offset): Promise<Array<Inquest>> =>
                 'inquestKeywords.inquestId',
             )
             .whereIn(
-                'inquestKeywords.keywordId',
+                'inquestKeywords.inquestKeywordId',
                 keywords
-            )
-
-    query.limit(parseInt(limit) >= 0 ? parseInt(limit) : 10);
-    query.offset(parseInt(offset) >= 0 ? parseInt(offset) : 10);
+            );
 
     return query;
 }
