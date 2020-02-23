@@ -1,14 +1,12 @@
 import { getInquestById, getInquests } from '../db/inquests';
+import { getInquestKeywords, getAuthorityKeywords } from '../db/keywords';
 import * as express from 'express';
 
 const app = express();
 
 // Middleware
 app.use((req, res, next) => {
-  console.log(
-    'Received request with body: ',
-    JSON.stringify(req.body, null, 2)
-  );
+  console.log('Received request with body: ', JSON.stringify(req.body, null, 2));
   res.set('Access-Control-Allow-Origin', 'http://staging.inquests.ca');
   next();
 });
@@ -40,6 +38,18 @@ app.get('/inquests', async (req, res) => {
   const offsetParsed = parseInt(offset) >= 0 ? parseInt(offset) : 0;
   const inquests = await getInquests(keyword, limitParsed, offsetParsed);
   res.json(inquests);
+});
+
+// Get all inquest keywords
+app.get('/inquestKeywords', async (_req, res) => {
+  const inquestKeywords = await getInquestKeywords();
+  res.json(inquestKeywords);
+});
+
+// Get all authority keywords
+app.get('/authorityKeywords', async (_req, res) => {
+  const authorityKeywords = await getAuthorityKeywords();
+  res.json(authorityKeywords);
 });
 
 export default app;
