@@ -18,6 +18,7 @@ def deploy():
     os.mkdir(build_path)
     run_bash_cmd('tsc --outDir build index.ts')
 
+    # TODO: avoid uploading entire node_modules folder everytime...
     print('3. Creating zip')
     run_bash_cmd('zip -r lambdabuild . ../node_modules', cwd=build_path, stdout=FNULL)
 
