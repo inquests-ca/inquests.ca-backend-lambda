@@ -19,11 +19,7 @@ export const getInquests = async (
     .offset(offset);
   if (keywords !== undefined)
     query
-      .innerJoin(
-        'inquestKeywords',
-        'inquest.inquestId',
-        'inquestKeywords.inquestId'
-      )
+      .innerJoin('inquestKeywords', 'inquest.inquestId', 'inquestKeywords.inquestId')
       .whereIn('inquestKeywords.inquestKeywordId', keywords);
 
   return query;
