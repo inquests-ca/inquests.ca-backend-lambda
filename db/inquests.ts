@@ -15,6 +15,7 @@ export const getInquests = async (
   const query = knex
     .select('inquest.*')
     .from('inquest')
+    .groupBy('inquest.inquestID')
     .limit(limit)
     .offset(offset);
   if (keywords !== undefined)

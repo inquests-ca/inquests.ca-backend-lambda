@@ -1,4 +1,5 @@
 import { getInquestById, getInquests } from '../db/inquests';
+import { getAuthorityById, getAuthorities } from '../db/authorities';
 import { getInquestKeywords, getAuthorityKeywords } from '../db/keywords';
 import * as express from 'express';
 
@@ -7,8 +8,39 @@ const app = express();
 // Middleware
 app.use((req, res, next) => {
   console.log('Received request with body: ', JSON.stringify(req.body, null, 2));
-  res.set('Access-Control-Allow-Origin', 'http://staging.inquests.ca');
+  res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
   next();
+});
+
+// TODO: move routes to separate files.
+
+// Get authority by ID
+app.get('/authority/:authorityId(\\d+)', async (req, res) => {
+  const { authorityId } = req.params;
+  const authority = await getAuthorityById(authorityId);
+  if (authority === undefined) res.status(404).send('Authority not found');
+  else res.json(authority);
+});
+
+// Get all authorities, with optional search parameters and pagination
+// e.g.: /authorities?keyword[]=1&limit=50&offset=100
+app.get('/authorities', async (req, res) => {
+  const {
+    // Filtering
+    keyword,
+
+    // Pagination
+    offset,
+    limit,
+
+    // Ordering... TODO
+  } = req.query;
+
+  // TODO: create limit, offset default consts.
+  const limitParsed = parseInt(limit) >= 0 ? parseInt(limit) : 50;
+  const offsetParsed = parseInt(offset) >= 0 ? parseInt(offset) : 0;
+  const authorities = await getAuthorities(keyword, limitParsed, offsetParsed);
+  res.json(authorities);
 });
 
 // Get inquest by ID
