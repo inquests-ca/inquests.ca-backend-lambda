@@ -8,7 +8,7 @@ const app = express();
 // Middleware
 app.use((req, res, next) => {
   console.log('Received request with body: ', JSON.stringify(req.body, null, 2));
-  res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+  res.set('Access-Control-Allow-Origin', 'http://staging.inquests.ca');
   next();
 });
 
