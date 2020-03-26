@@ -1,6 +1,7 @@
 import { getInquestById, getInquests } from '../db/inquests';
 import { getAuthorityById, getAuthorities } from '../db/authorities';
 import { getInquestKeywords, getAuthorityKeywords } from '../db/keywords';
+import { getJurisdictions } from '../db/jurisdictions';
 import * as express from 'express';
 
 const app = express();
@@ -84,6 +85,12 @@ app.get('/inquestKeywords', async (_req, res) => {
 app.get('/authorityKeywords', async (_req, res) => {
   const authorityKeywords = await getAuthorityKeywords();
   res.json(authorityKeywords);
+});
+
+// Get all jurisdictions
+app.get('/jurisdictions', async (_req, res) => {
+  const jurisdictions = await getJurisdictions();
+  res.json(jurisdictions);
 });
 
 export default app;
