@@ -9,6 +9,7 @@ export const getInquestById = async (inquestId: number): Promise<Inquest> =>
 
 export const getInquests = async (
   keywords: Array<string>,
+  jurisdiction: string,
   limit: number,
   offset: number
 ): Promise<Array<Inquest>> => {
@@ -22,6 +23,10 @@ export const getInquests = async (
     query
       .innerJoin('inquestKeywords', 'inquest.inquestId', 'inquestKeywords.inquestId')
       .whereIn('inquestKeywords.inquestKeywordId', keywords);
+  if (jurisdiction !== undefined)
+    query
+      .innerJoin('source', 'inquest.sourceID', 'source.sourceID')
+      .where('source.jurisdictionID', jurisdiction);
 
   return query;
 };

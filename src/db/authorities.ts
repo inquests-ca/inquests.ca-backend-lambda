@@ -9,6 +9,7 @@ export const getAuthorityById = async (authorityID: number): Promise<Authority> 
 
 export const getAuthorities = async (
   keywords: Array<string>,
+  jurisdiction: string,
   limit: number,
   offset: number
 ): Promise<Array<Authority>> => {
@@ -22,6 +23,12 @@ export const getAuthorities = async (
     query
       .innerJoin('authorityKeywords', 'authority.authorityId', 'authorityKeywords.authorityId')
       .whereIn('authorityKeywords.authorityKeywordId', keywords);
+  if (jurisdiction !== undefined)
+    // TODO: only use highest ranking source.
+    query
+      .innerJoin('authorityDocuments', 'authority.authorityId', 'authorityDocuments.authorityId')
+      .innerJoin('source', 'authorityDocuments.sourceID', 'source.sourceID')
+      .where('source.jurisdictionID', jurisdiction);
 
   return query;
 };

@@ -23,11 +23,12 @@ app.get('/authority/:authorityId(\\d+)', async (req, res) => {
 });
 
 // Get all authorities, with optional search parameters and pagination
-// e.g.: /authorities?keyword[]=1&limit=50&offset=100
+// e.g.: /authorities?keyword[]=CRIMINAL_JUSTICE&limit=50&offset=100&jurisdiction=CAD_ON
 app.get('/authorities', async (req, res) => {
   const {
     // Filtering
     keyword,
+    jurisdiction,
 
     // Pagination
     offset,
@@ -39,7 +40,7 @@ app.get('/authorities', async (req, res) => {
   // TODO: create limit, offset default consts.
   const limitParsed = parseInt(limit) >= 0 ? parseInt(limit) : 50;
   const offsetParsed = parseInt(offset) >= 0 ? parseInt(offset) : 0;
-  const authorities = await getAuthorities(keyword, limitParsed, offsetParsed);
+  const authorities = await getAuthorities(keyword, jurisdiction, limitParsed, offsetParsed);
   res.json(authorities);
 });
 
@@ -52,11 +53,12 @@ app.get('/inquest/:inquestId(\\d+)', async (req, res) => {
 });
 
 // Get all inquests, with optional search parameters and pagination
-// e.g.: /inquests?keyword[]=1&limit=50&offset=100
+// e.g.: /inquests?keyword[]=CAUSE_CRUSH&limit=50&offset=100&jurisdiction=CAD_ON
 app.get('/inquests', async (req, res) => {
   const {
     // Filtering
     keyword,
+    jurisdiction,
 
     // Pagination
     offset,
@@ -68,7 +70,7 @@ app.get('/inquests', async (req, res) => {
   // TODO: create limit, offset default consts.
   const limitParsed = parseInt(limit) >= 0 ? parseInt(limit) : 50;
   const offsetParsed = parseInt(offset) >= 0 ? parseInt(offset) : 0;
-  const inquests = await getInquests(keyword, limitParsed, offsetParsed);
+  const inquests = await getInquests(keyword, jurisdiction, limitParsed, offsetParsed);
   res.json(inquests);
 });
 
