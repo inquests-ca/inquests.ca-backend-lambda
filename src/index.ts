@@ -1,7 +1,7 @@
 console.log('Loading function');
 
 import app from './app/app';
-import awsServerlessExpress from 'aws-serverless-express';
+import awsServerlessExpress = require('aws-serverless-express');
 
 const server = awsServerlessExpress.createServer(app);
 
