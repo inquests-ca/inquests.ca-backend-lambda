@@ -18,8 +18,10 @@ export const getAuthorities = async (
     .from('authority')
     .groupBy('authority.authorityID')
     .limit(limit)
-    .offset(offset);
+    .offset(offset)
+    .orderBy('primary', 'desc');
   if (keywords !== undefined)
+    // TODO: should be AND instead of OR.
     query
       .innerJoin('authorityKeywords', 'authority.authorityId', 'authorityKeywords.authorityId')
       .whereIn('authorityKeywords.authorityKeywordId', keywords);

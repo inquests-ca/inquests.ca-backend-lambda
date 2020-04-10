@@ -18,7 +18,8 @@ export const getInquests = async (
     .from('inquest')
     .groupBy('inquest.inquestID')
     .limit(limit)
-    .offset(offset);
+    .offset(offset)
+    .orderBy('primary', 'desc');
   if (keywords !== undefined)
     query
       .innerJoin('inquestKeywords', 'inquest.inquestId', 'inquestKeywords.inquestId')
