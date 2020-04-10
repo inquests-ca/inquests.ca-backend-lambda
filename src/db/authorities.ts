@@ -1,4 +1,4 @@
-import Authority from '../model/Authority';
+import { Authority } from './models';
 import knex from './knex';
 
 export const getAuthorityById = async (authorityID: number): Promise<Authority> =>

@@ -1,6 +1,5 @@
 import knex from './knex';
-import InquestKeyword from '../model/InquestKeyword';
-import AuthorityKeyword from '../model/AuthorityKeyword';
+import { AuthorityKeyword, InquestKeyword } from './models';
 
 export const getInquestKeywords = async (): Promise<Array<InquestKeyword>> =>
   knex.from('inquestKeyword');

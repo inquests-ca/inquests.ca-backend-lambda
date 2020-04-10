@@ -1,4 +1,4 @@
-import Inquest from '../model/Inquest';
+import { Inquest } from './models';
 import knex from './knex';
 
 export const getInquestById = async (inquestId: number): Promise<Inquest> =>
