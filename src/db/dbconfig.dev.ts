@@ -1,6 +1,6 @@
 const dbconfig = {
   client: 'mysql',
-  version: '5.7', // TODO: confirm version
+  version: '5.7',
   debug: true,
   connection: {
     host: '127.0.0.1',

@@ -3,7 +3,7 @@
 // TODO: tear down connection pool?
 const dbconfig = {
   client: 'mysql',
-  version: '5.7', // TODO: confirm version
+  version: '5.7',
   connection: {
     host: process.env.RDS_HOST,
     user: process.env.RDS_USER,
