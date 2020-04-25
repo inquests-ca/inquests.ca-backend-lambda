@@ -1,8 +1,16 @@
-import knex from './knex';
-import { AuthorityKeyword, InquestKeyword } from './models';
+import { getRepository } from 'typeorm';
 
-export const getInquestKeywords = async (): Promise<Array<InquestKeyword>> =>
-  knex.from('inquestKeyword');
+import { InquestCategory } from '../entity/InquestCategory';
+import { AuthorityCategory } from '../entity/AuthorityCategory';
 
-export const getAuthorityKeywords = async (): Promise<Array<AuthorityKeyword>> =>
-  knex.from('authorityKeyword');
+export const getInquestKeywords = async (): Promise<InquestCategory[]> =>
+  getRepository(InquestCategory)
+    .createQueryBuilder('inquestCategory')
+    .innerJoinAndSelect('inquestCategory.inquestKeywords', 'inquestKeywords')
+    .getMany();
+
+export const getAuthorityKeywords = async (): Promise<AuthorityCategory[]> =>
+  getRepository(AuthorityCategory)
+    .createQueryBuilder('authorityCategory')
+    .innerJoinAndSelect('authorityCategory.authorityKeywords', 'authorityKeywords')
+    .getMany();

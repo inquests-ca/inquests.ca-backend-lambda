@@ -1,4 +1,6 @@
-import { Jurisdiction } from './models';
-import knex from './knex';
+import { getRepository } from 'typeorm';
 
-export const getJurisdictions = async (): Promise<Jurisdiction> => knex.from('jurisdiction');
+import { Jurisdiction } from '../entity/Jurisdiction';
+
+export const getJurisdictions = async (): Promise<Jurisdiction[]> =>
+  getRepository(Jurisdiction).find();

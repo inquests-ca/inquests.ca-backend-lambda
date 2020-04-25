@@ -1,11 +1,19 @@
-import { Authority } from './models';
-import knex from './knex';
+import { getRepository } from 'typeorm';
 
-export const getAuthorityById = async (authorityID: number): Promise<Authority> =>
-  knex
-    .first()
-    .from('authority')
-    .where({ authorityID });
+import { Authority } from '../entity/Authority';
+
+// TODO: use leftJoin where appropriate.
+export const getAuthorityById = async (authorityId: number): Promise<Authority> =>
+  // TODO: authority document type.
+  // TODO: use innerJoinAndMapOne where appropriate.
+  getRepository(Authority)
+    .createQueryBuilder('authority')
+    .innerJoinAndSelect('authority.authorityDocuments', 'documents')
+    .innerJoinAndSelect('documents.source', 'source')
+    .innerJoinAndSelect('documents.authorityDocumentLinks', 'documentLinks')
+    .innerJoinAndSelect('documentLinks.documentSource', 'documentSource')
+    .where('authority.authorityId = :authorityId', { authorityId })
+    .getOne();
 
 export const getAuthorities = async (
   keywords: Array<string>,
@@ -13,24 +21,28 @@ export const getAuthorities = async (
   limit: number,
   offset: number
 ): Promise<Array<Authority>> => {
-  const query = knex
-    .select('authority.*')
-    .from('authority')
-    .groupBy('authority.authorityID')
-    .limit(limit)
-    .offset(offset)
-    .orderBy('primary', 'desc');
+  const query = await getRepository(Authority)
+    .createQueryBuilder('authority')
+    .innerJoinAndSelect(
+      'authority.authorityDocuments',
+      'primaryDocument',
+      'primaryDocument.primary = 1'
+    )
+    .innerJoinAndSelect('primaryDocument.source', 'source')
+    .take(limit)
+    .skip(offset)
+    .orderBy('authority.primary', 'DESC')
+    .addOrderBy('source.rank', 'DESC')
+    .addOrderBy('primaryDocument.created', 'DESC');
   if (keywords !== undefined)
-    // TODO: should be AND instead of OR.
-    query
-      .innerJoin('authorityKeywords', 'authority.authorityId', 'authorityKeywords.authorityId')
-      .whereIn('authorityKeywords.authorityKeywordId', keywords);
+    query.innerJoin(
+      'authority.authorityKeywords',
+      'keywords',
+      'keywords.authorityKeywordId IN (:keywords)',
+      { keywords }
+    );
   if (jurisdiction !== undefined)
-    // TODO: only use highest ranking source.
-    query
-      .innerJoin('authorityDocuments', 'authority.authorityId', 'authorityDocuments.authorityId')
-      .innerJoin('source', 'authorityDocuments.sourceID', 'source.sourceID')
-      .where('source.jurisdictionID', jurisdiction);
+    query.where('source.jurisdiction = :jurisdiction', { jurisdiction });
 
-  return query;
+  return query.getMany();
 };

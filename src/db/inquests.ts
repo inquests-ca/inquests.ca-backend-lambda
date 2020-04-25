@@ -1,33 +1,42 @@
-import { Inquest } from './models';
-import knex from './knex';
+// TODO: prune and clean up models.
+import { getRepository } from 'typeorm';
+
+import { Inquest } from '../entity/Inquest';
 
 export const getInquestById = async (inquestId: number): Promise<Inquest> =>
-  knex
-    .first()
-    .from('inquest')
-    .where({ inquestId });
+  getRepository(Inquest)
+    .createQueryBuilder('inquest')
+    .innerJoinAndSelect('inquest.jurisdiction', 'jurisdiction')
+    .innerJoinAndSelect('inquest.deceased', 'deceased')
+    .innerJoinAndSelect('deceased.deathManner', 'deathManner')
+    .innerJoinAndSelect('deceased.inquestType', 'inquestType')
+    .innerJoinAndSelect('inquest.inquestDocuments', 'documents')
+    .innerJoinAndSelect('documents.documentSource', 'documentSource')
+    .where('inquest.inquestId = :inquestId', { inquestId })
+    .getOne();
 
 export const getInquests = async (
   keywords: Array<string>,
   jurisdiction: string,
   limit: number,
   offset: number
-): Promise<Array<Inquest>> => {
-  const query = knex
-    .select('inquest.*')
-    .from('inquest')
-    .groupBy('inquest.inquestID')
-    .limit(limit)
-    .offset(offset)
-    .orderBy('primary', 'desc');
-  if (keywords !== undefined)
-    query
-      .innerJoin('inquestKeywords', 'inquest.inquestId', 'inquestKeywords.inquestId')
-      .whereIn('inquestKeywords.inquestKeywordId', keywords);
+): Promise<Inquest[]> => {
+  const query = getRepository(Inquest)
+    .createQueryBuilder('inquest')
+    .innerJoinAndSelect('inquest.jurisdiction', 'jurisdiction')
+    .take(limit)
+    .skip(offset)
+    .orderBy('inquest.primary', 'DESC')
+    .orderBy('inquest.start', 'DESC');
   if (jurisdiction !== undefined)
-    query
-      .innerJoin('source', 'inquest.sourceID', 'source.sourceID')
-      .where('source.jurisdictionID', jurisdiction);
+    query.where('jurisdiction.jurisdictionId = :jurisdiction', { jurisdiction });
+  if (keywords !== undefined)
+    query.innerJoin(
+      'inquest.inquestKeywords',
+      'keywords',
+      'keywords.inquestKeywordId IN (:keywords)',
+      { keywords }
+    );
 
-  return query;
+  return query.getMany();
 };
