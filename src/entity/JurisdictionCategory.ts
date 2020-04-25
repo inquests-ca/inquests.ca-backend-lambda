@@ -1,14 +1,10 @@
 import { Column, Entity, BaseEntity } from 'typeorm';
 
-@Entity('jurisdiction_category', { schema: 'inquestsca' })
+@Entity('jurisdiction_category')
 export class JurisdictionCategory extends BaseEntity {
-  @Column('varchar', {
-    primary: true,
-    name: 'jurisdictionCategoryId',
-    length: 255,
-  })
+  @Column('varchar', { primary: true, length: 255 })
   jurisdictionCategoryId: string;
 
-  @Column('varchar', { name: 'name', length: 255 })
+  @Column('varchar', { length: 255 })
   name: string;
 }

@@ -1,32 +1,13 @@
-import { Column, Entity, OneToMany, BaseEntity } from 'typeorm';
-import { AuthorityDocumentLinks } from './AuthorityDocumentLinks';
-import { InquestDocument } from './InquestDocument';
+import { Column, Entity, BaseEntity } from 'typeorm';
 
-@Entity('documentSource', { schema: 'inquestsca' })
+@Entity('documentSource')
 export class DocumentSource extends BaseEntity {
-  @Column('char', { primary: true, name: 'documentSourceId', length: 100 })
+  @Column('char', { primary: true, length: 100 })
   documentSourceId: string;
 
-  @Column('varchar', { name: 'name', length: 255 })
+  @Column('varchar', { length: 255 })
   name: string;
 
-  @Column('tinyint', {
-    name: 'hasPaywall',
-    nullable: true,
-    unsigned: true,
-    default: () => "'0'",
-  })
-  hasPaywall: number | null;
-
-  @OneToMany(
-    () => AuthorityDocumentLinks,
-    authorityDocumentLinks => authorityDocumentLinks.documentSource
-  )
-  authorityDocumentLinks: AuthorityDocumentLinks[];
-
-  @OneToMany(
-    () => InquestDocument,
-    inquestDocument => inquestDocument.documentSource
-  )
-  inquestDocuments: InquestDocument[];
+  @Column('tinyint', { nullable: true })
+  hasPaywall: boolean | null;
 }

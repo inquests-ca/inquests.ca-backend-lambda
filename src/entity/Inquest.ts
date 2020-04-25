@@ -1,7 +1,6 @@
 import {
   Column,
   Entity,
-  Index,
   JoinColumn,
   JoinTable,
   ManyToMany,
@@ -16,49 +15,42 @@ import { Jurisdiction } from './Jurisdiction';
 import { InquestDocument } from './InquestDocument';
 import { InquestKeyword } from './InquestKeyword';
 
-@Index('inquest_id_UNIQUE', ['inquestId'], { unique: true })
-@Index('fk_jurisdictionId_inquest1_idx', ['jurisdictionId'], {})
-@Entity('inquest', { schema: 'inquestsca' })
+@Entity('inquest')
 export class Inquest extends BaseEntity {
-  @PrimaryGeneratedColumn({ type: 'int', name: 'inquestId', unsigned: true })
+  @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   inquestId: number;
 
-  @Column('char', { name: 'jurisdictionId', length: 100 })
+  @Column('char', { length: 100 })
   jurisdictionId: string;
 
-  @Column('tinyint', {
-    name: 'primary',
-    nullable: true,
-    unsigned: true,
-    default: () => "'0'",
-  })
-  primary: number | null;
+  @Column('tinyint', { nullable: true })
+  primary: boolean | null;
 
-  @Column('varchar', { name: 'name', length: 255 })
+  @Column('varchar', { length: 255 })
   name: string;
 
-  @Column('varchar', { name: 'overview', nullable: true, length: 255 })
+  @Column('varchar', { nullable: true, length: 255 })
   overview: string | null;
 
-  @Column('varchar', { name: 'synopsis', nullable: true, length: 10000 })
+  @Column('varchar', { nullable: true, length: 10000 })
   synopsis: string | null;
 
-  @Column('varchar', { name: 'notes', nullable: true, length: 1000 })
+  @Column('varchar', { nullable: true, length: 1000 })
   notes: string | null;
 
-  @Column('varchar', { name: 'presidingOfficer', nullable: true, length: 255 })
+  @Column('varchar', { nullable: true, length: 255 })
   presidingOfficer: string | null;
 
-  @Column('date', { name: 'start', nullable: true })
+  @Column('date', { nullable: true })
   start: string | null;
 
-  @Column('date', { name: 'end', nullable: true })
+  @Column('date', { nullable: true })
   end: string | null;
 
-  @Column('int', { name: 'sittingDays', nullable: true })
+  @Column('int', { nullable: true })
   sittingDays: number | null;
 
-  @Column('int', { name: 'exhibits', nullable: true })
+  @Column('int', { nullable: true })
   exhibits: number | null;
 
   @ManyToMany(
@@ -71,17 +63,10 @@ export class Inquest extends BaseEntity {
     () => Deceased,
     deceased => deceased.inquest
   )
-  deceaseds: Deceased[];
+  deceased: Deceased[];
 
-  @ManyToOne(
-    () => Jurisdiction,
-    jurisdiction => jurisdiction.inquests,
-    {
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
-    }
-  )
-  @JoinColumn([{ name: 'jurisdictionId', referencedColumnName: 'jurisdictionId' }])
+  @ManyToOne(() => Jurisdiction)
+  @JoinColumn({ name: 'jurisdictionId', referencedColumnName: 'jurisdictionId' })
   jurisdiction: Jurisdiction;
 
   @OneToMany(
@@ -90,15 +75,10 @@ export class Inquest extends BaseEntity {
   )
   inquestDocuments: InquestDocument[];
 
-  @ManyToMany(
-    () => InquestKeyword,
-    inquestKeyword => inquestKeyword.inquests
-  )
+  @ManyToMany(() => InquestKeyword)
   @JoinTable({
     name: 'inquestKeywords',
-    joinColumns: [{ name: 'inquestId', referencedColumnName: 'inquestId' }],
-    inverseJoinColumns: [{ name: 'inquestKeywordId', referencedColumnName: 'inquestKeywordId' }],
-    schema: 'inquestsca',
+    joinColumn: { name: 'inquestId', referencedColumnName: 'inquestId' },
   })
   inquestKeywords: InquestKeyword[];
 }

@@ -1,17 +1,15 @@
-import { Column, Entity, Index, OneToMany, BaseEntity } from 'typeorm';
+import { Column, Entity, OneToMany, BaseEntity } from 'typeorm';
 import { AuthorityKeyword } from './AuthorityKeyword';
 
-@Index('keyword_id_UNIQUE', ['authorityCategoryId'], { unique: true })
-@Index('name_UNIQUE', ['name'], { unique: true })
-@Entity('authorityCategory', { schema: 'inquestsca' })
+@Entity('authorityCategory')
 export class AuthorityCategory extends BaseEntity {
-  @Column('char', { primary: true, name: 'authorityCategoryId', length: 100 })
+  @Column('char', { primary: true, length: 100 })
   authorityCategoryId: string;
 
-  @Column('varchar', { name: 'name', unique: true, length: 255 })
+  @Column('varchar', { unique: true, length: 255 })
   name: string;
 
-  @Column('varchar', { name: 'description', nullable: true, length: 255 })
+  @Column('varchar', { nullable: true, length: 255 })
   description: string | null;
 
   @OneToMany(

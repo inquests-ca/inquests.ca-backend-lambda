@@ -1,38 +1,25 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne, BaseEntity } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, BaseEntity } from 'typeorm';
 import { Authority } from './Authority';
 
-@Index('fk_authorityId_authorityCitations2_idx', ['supercededAuthorityId'], {})
-@Entity('authoritySuperceded', { schema: 'inquestsca' })
+@Entity('authoritySuperceded')
 export class AuthoritySuperceded extends BaseEntity {
-  @Column('int', { primary: true, name: 'authorityId', unsigned: true })
+  @Column('int', { primary: true, unsigned: true })
   authorityId: number;
 
-  @Column('int', {
-    primary: true,
-    name: 'supercededAuthorityId',
-    unsigned: true,
-  })
+  @Column('int', { primary: true, unsigned: true })
   supercededAuthorityId: number;
 
   @ManyToOne(
     () => Authority,
-    authority => authority.authoritySupercededs,
-    {
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
-    }
+    authority => authority.authoritySuperceded
   )
-  @JoinColumn([{ name: 'authorityId', referencedColumnName: 'authorityId' }])
+  @JoinColumn({ name: 'authorityId', referencedColumnName: 'authorityId' })
   authority: Authority;
 
   @ManyToOne(
     () => Authority,
-    authority => authority.authoritySupercededs2,
-    {
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
-    }
+    authority => authority.authoritySupercededBy
   )
-  @JoinColumn([{ name: 'supercededAuthorityId', referencedColumnName: 'authorityId' }])
+  @JoinColumn({ name: 'supercededAuthorityId', referencedColumnName: 'authorityId' })
   supercededAuthority: Authority;
 }

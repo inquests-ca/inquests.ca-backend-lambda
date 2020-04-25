@@ -1,21 +1,13 @@
-import { Column, Entity, Index, OneToMany, BaseEntity } from 'typeorm';
-import { InquestDocument } from './InquestDocument';
+import { Column, Entity, BaseEntity } from 'typeorm';
 
-@Index('documentType_UNIQUE', ['inquestDocumentTypeId'], { unique: true })
-@Entity('inquestDocumentType', { schema: 'inquestsca' })
+@Entity('inquestDocumentType')
 export class InquestDocumentType extends BaseEntity {
-  @Column('char', { primary: true, name: 'inquestDocumentTypeId', length: 100 })
+  @Column('char', { primary: true, length: 100 })
   inquestDocumentTypeId: string;
 
   @Column('varchar', { name: 'name', length: 255 })
   name: string;
 
-  @Column('varchar', { name: 'description', nullable: true, length: 255 })
+  @Column('varchar', { nullable: true, length: 255 })
   description: string | null;
-
-  @OneToMany(
-    () => InquestDocument,
-    inquestDocument => inquestDocument.inquestDocumentType
-  )
-  inquestDocuments: InquestDocument[];
 }

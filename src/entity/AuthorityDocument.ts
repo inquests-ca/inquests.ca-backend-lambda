@@ -1,7 +1,6 @@
 import {
   Column,
   Entity,
-  Index,
   JoinColumn,
   ManyToOne,
   OneToMany,
@@ -13,77 +12,45 @@ import { Authority } from './Authority';
 import { Source } from './Source';
 import { AuthorityDocumentLinks } from './AuthorityDocumentLinks';
 
-@Index('authorityDocumentId_UNIQUE', ['authorityDocumentId'], { unique: true })
-@Index('fk_sourceID_authorityDocuments1_idx', ['sourceId'], {})
-@Index('fk_authorityDocumentTypeId_authorityDocuments1_idx', ['authorityDocumentTypeId'], {})
-@Index('fk_authorityId_authorityDocuments1', ['authorityId'], {})
-@Entity('authorityDocument', { schema: 'inquestsca' })
+@Entity('authorityDocument')
 export class AuthorityDocument extends BaseEntity {
-  @PrimaryGeneratedColumn({
-    type: 'int',
-    name: 'authorityDocumentId',
-    unsigned: true,
-  })
+  @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   authorityDocumentId: number;
 
-  @Column('int', { name: 'authorityId', unsigned: true })
+  @Column('int', { unsigned: true })
   authorityId: number;
 
-  @Column('char', {
-    name: 'authorityDocumentTypeId',
-    nullable: true,
-    length: 100,
-  })
+  @Column('char', { nullable: true, length: 100 })
   authorityDocumentTypeId: string | null;
 
-  @Column('char', { name: 'sourceId', nullable: true, length: 100 })
+  @Column('char', { nullable: true, length: 100 })
   sourceId: string | null;
 
-  @Column('tinyint', { name: 'primary', nullable: true, default: () => "'0'" })
-  primary: number | null;
+  @Column('tinyint', { nullable: true })
+  primary: boolean | null;
 
-  @Column('varchar', { name: 'name', nullable: true, length: 255 })
+  @Column('varchar', { nullable: true, length: 255 })
   name: string | null;
 
-  @Column('varchar', { name: 'citation', nullable: true, length: 255 })
+  @Column('varchar', { nullable: true, length: 255 })
   citation: string | null;
 
-  @Column('date', { name: 'created', nullable: true })
+  @Column('date', { nullable: true })
   created: string | null;
 
-  @ManyToOne(
-    () => AuthorityDocumentType,
-    authorityDocumentType => authorityDocumentType.authorityDocuments,
-    { onDelete: 'CASCADE', onUpdate: 'CASCADE' }
-  )
-  @JoinColumn([
-    {
-      name: 'authorityDocumentTypeId',
-      referencedColumnName: 'authorityDocumentTypeId',
-    },
-  ])
+  @ManyToOne(() => AuthorityDocumentType)
+  @JoinColumn({ name: 'authorityDocumentTypeId', referencedColumnName: 'authorityDocumentTypeId' })
   authorityDocumentType: AuthorityDocumentType;
 
   @ManyToOne(
     () => Authority,
-    authority => authority.authorityDocuments,
-    {
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
-    }
+    authority => authority.authorityDocuments
   )
-  @JoinColumn([{ name: 'authorityId', referencedColumnName: 'authorityId' }])
+  @JoinColumn({ name: 'authorityId', referencedColumnName: 'authorityId' })
   authority: Authority;
 
-  @ManyToOne(
-    () => Source,
-    source => source.authorityDocuments,
-    {
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
-    }
-  )
-  @JoinColumn([{ name: 'sourceId', referencedColumnName: 'sourceId' }])
+  @ManyToOne(() => Source)
+  @JoinColumn({ name: 'sourceId', referencedColumnName: 'sourceId' })
   source: Source;
 
   @OneToMany(

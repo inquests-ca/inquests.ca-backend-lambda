@@ -1,40 +1,24 @@
-import { Column, Entity, Index, JoinColumn, ManyToMany, ManyToOne, BaseEntity } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, BaseEntity } from 'typeorm';
 import { AuthorityCategory } from './AuthorityCategory';
-import { Authority } from './Authority';
 
-@Index('keyword_id_UNIQUE', ['authorityKeywordId'], { unique: true })
-@Index('name_UNIQUE', ['name'], { unique: true })
-@Index('fk_authorityCategoryId_authorityKeyword1_idx', ['authorityCategoryId'], {})
-@Entity('authorityKeyword', { schema: 'inquestsca' })
+@Entity('authorityKeyword')
 export class AuthorityKeyword extends BaseEntity {
-  @Column('char', { primary: true, name: 'authorityKeywordId', length: 100 })
+  @Column('char', { primary: true, length: 100 })
   authorityKeywordId: string;
 
-  @Column('char', { name: 'authorityCategoryId', nullable: true, length: 100 })
+  @Column('char', { nullable: true, length: 100 })
   authorityCategoryId: string | null;
 
-  @Column('varchar', { name: 'name', unique: true, length: 255 })
+  @Column('varchar', { unique: true, length: 255 })
   name: string;
 
-  @Column('varchar', { name: 'description', nullable: true, length: 255 })
+  @Column('varchar', { nullable: true, length: 255 })
   description: string | null;
 
   @ManyToOne(
     () => AuthorityCategory,
-    authorityCategory => authorityCategory.authorityKeywords,
-    { onDelete: 'CASCADE', onUpdate: 'CASCADE' }
+    authorityCategory => authorityCategory.authorityKeywords
   )
-  @JoinColumn([
-    {
-      name: 'authorityCategoryId',
-      referencedColumnName: 'authorityCategoryId',
-    },
-  ])
+  @JoinColumn({ name: 'authorityCategoryId', referencedColumnName: 'authorityCategoryId' })
   authorityCategory: AuthorityCategory;
-
-  @ManyToMany(
-    () => Authority,
-    authority => authority.authorityKeywords
-  )
-  authorities: Authority[];
 }

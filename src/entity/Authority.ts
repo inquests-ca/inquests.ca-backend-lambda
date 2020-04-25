@@ -14,32 +14,27 @@ import { AuthorityKeyword } from './AuthorityKeyword';
 import { AuthorityRelated } from './AuthorityRelated';
 import { AuthoritySuperceded } from './AuthoritySuperceded';
 
-@Entity()
+@Entity('authority')
 export class Authority extends BaseEntity {
-  @PrimaryGeneratedColumn({ type: 'int', name: 'authorityId', unsigned: true })
+  @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   authorityId: number;
 
-  @Column('tinyint', {
-    name: 'primary',
-    nullable: true,
-    unsigned: true,
-    default: () => "'0'",
-  })
-  primary: number | null;
+  @Column('tinyint', { nullable: true })
+  primary: boolean | null;
 
-  @Column('varchar', { name: 'name', nullable: true, length: 255 })
+  @Column('varchar', { nullable: true, length: 255 })
   name: string | null;
 
-  @Column('varchar', { name: 'overview', nullable: true, length: 255 })
+  @Column('varchar', { nullable: true, length: 255 })
   overview: string | null;
 
-  @Column('varchar', { name: 'synopsis', nullable: true, length: 10000 })
+  @Column('varchar', { nullable: true, length: 10000 })
   synopsis: string | null;
 
-  @Column('varchar', { name: 'quotes', nullable: true, length: 10000 })
+  @Column('varchar', { nullable: true, length: 10000 })
   quotes: string | null;
 
-  @Column('varchar', { name: 'notes', nullable: true, length: 1000 })
+  @Column('varchar', { nullable: true, length: 1000 })
   notes: string | null;
 
   @OneToMany(
@@ -52,7 +47,7 @@ export class Authority extends BaseEntity {
     () => AuthorityCitations,
     authorityCitations => authorityCitations.citedAuthority
   )
-  authorityCitations2: AuthorityCitations[];
+  authorityCitedBy: AuthorityCitations[];
 
   @OneToMany(
     () => AuthorityDocument,
@@ -66,26 +61,15 @@ export class Authority extends BaseEntity {
   )
   @JoinTable({
     name: 'authorityInquests',
-    joinColumns: [{ name: 'authorityId', referencedColumnName: 'authorityId' }],
-    inverseJoinColumns: [{ name: 'inquestId', referencedColumnName: 'inquestId' }],
-    schema: 'inquestsca',
+    joinColumn: { name: 'authorityId', referencedColumnName: 'authorityId' },
+    inverseJoinColumn: { name: 'inquestId', referencedColumnName: 'inquestId' },
   })
   inquests: Inquest[];
 
-  @ManyToMany(
-    () => AuthorityKeyword,
-    authorityKeyword => authorityKeyword.authorities
-  )
+  @ManyToMany(() => AuthorityKeyword)
   @JoinTable({
     name: 'authorityKeywords',
-    joinColumns: [{ name: 'authorityId', referencedColumnName: 'authorityId' }],
-    inverseJoinColumns: [
-      {
-        name: 'authorityKeywordId',
-        referencedColumnName: 'authorityKeywordId',
-      },
-    ],
-    schema: 'inquestsca',
+    joinColumn: { name: 'authorityId', referencedColumnName: 'authorityId' },
   })
   authorityKeywords: AuthorityKeyword[];
 
@@ -93,23 +77,25 @@ export class Authority extends BaseEntity {
     () => AuthorityRelated,
     authorityRelated => authorityRelated.authority
   )
-  authorityRelateds: AuthorityRelated[];
+  authorityRelated: AuthorityRelated[];
 
+  // TODO: note that this relationship is undirected (e.g., 1 related to 2 => 2 related to 1); how to prevent duplicates?
+  // TODO: lookup how to represent undirected graphs in SQL.
   @OneToMany(
     () => AuthorityRelated,
     authorityRelated => authorityRelated.relatedAuthority
   )
-  authorityRelateds2: AuthorityRelated[];
+  authorityRelatedDup: AuthorityRelated[];
 
   @OneToMany(
     () => AuthoritySuperceded,
     authoritySuperceded => authoritySuperceded.authority
   )
-  authoritySupercededs: AuthoritySuperceded[];
+  authoritySuperceded: AuthoritySuperceded[];
 
   @OneToMany(
     () => AuthoritySuperceded,
     authoritySuperceded => authoritySuperceded.supercededAuthority
   )
-  authoritySupercededs2: AuthoritySuperceded[];
+  authoritySupercededBy: AuthoritySuperceded[];
 }
