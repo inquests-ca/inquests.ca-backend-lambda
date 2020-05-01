@@ -6,7 +6,10 @@ import subprocess
 FNULL = open(os.devnull, 'w')
 
 
-# TODO: error handling
+# TODO: error handling.
+# TODO: convert to Bash script.
+# TODO: update.
+# TODO: have node server watch changes.
 def deploy():
     build_path = os.path.abspath('./build')
 
@@ -16,17 +19,17 @@ def deploy():
     
     print('2. Compiling project to build folder')
     os.mkdir(build_path)
-    run_bash_cmd('tsc --outDir build index.ts')
+    run_bash_cmd('tsc --outDir build src/index.ts')
 
     # TODO: avoid uploading entire node_modules folder everytime...
     print('3. Creating zip')
     run_bash_cmd('zip -r lambdabuild . ../node_modules', cwd=build_path, stdout=FNULL)
 
-    print('4. Uploading to AWS')
-    run_bash_cmd('aws lambda update-function-code --function-name InquestCrud --zip-file fileb://build/lambdabuild.zip')
+    # print('4. Uploading to AWS')
+    # run_bash_cmd('aws lambda update-function-code --function-name InquestCrud --zip-file fileb://build/lambdabuild.zip')
 
-    print('5. Cleaning up')
-    shutil.rmtree(build_path)
+    # print('5. Cleaning up')
+    # shutil.rmtree(build_path)
 
 
 def run_bash_cmd(cmd, cwd=None, stdout=None):
@@ -36,3 +39,16 @@ def run_bash_cmd(cmd, cwd=None, stdout=None):
 
 if __name__ == '__main__':
     deploy()
+
+#!/bin/bash
+# declare -a TOP_LEVEL_FILES=("index.local.ts")
+
+# rm inquests-ca.zip
+
+# for file in "${TOP_LEVEL_FILES[@]}"
+# do
+#     zip -r inquests-ca.zip "$file"
+# done
+
+# echo "Created inquests-ca.zip.";
+# # TODO: push to AWS.

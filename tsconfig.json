@@ -2,12 +2,24 @@
     "compileOnSave": true,
     "compilerOptions": {
         "outDir": "./build",
-        "watch": true
+        "watch": true,
+        "lib": [
+            "es5",
+            "es6"
+        ],
+        "target": "es5",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "sourceMap": true,
     },
     "include": [
         "src/**/*"
     ],
     "exclude": [
-        "node_modules"
-    ]
+        "node_modules/**/*"
+    ],
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
 }

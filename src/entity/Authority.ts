@@ -7,12 +7,9 @@ import {
   PrimaryGeneratedColumn,
   BaseEntity,
 } from 'typeorm';
-import { AuthorityCitations } from './AuthorityCitations';
 import { AuthorityDocument } from './AuthorityDocument';
 import { Inquest } from './Inquest';
 import { AuthorityKeyword } from './AuthorityKeyword';
-import { AuthorityRelated } from './AuthorityRelated';
-import { AuthoritySuperceded } from './AuthoritySuperceded';
 
 @Entity('authority')
 export class Authority extends BaseEntity {
@@ -38,18 +35,6 @@ export class Authority extends BaseEntity {
   notes: string | null;
 
   @OneToMany(
-    () => AuthorityCitations,
-    authorityCitations => authorityCitations.authority
-  )
-  authorityCitations: AuthorityCitations[];
-
-  @OneToMany(
-    () => AuthorityCitations,
-    authorityCitations => authorityCitations.citedAuthority
-  )
-  authorityCitedBy: AuthorityCitations[];
-
-  @OneToMany(
     () => AuthorityDocument,
     authorityDocument => authorityDocument.authority
   )
@@ -73,29 +58,72 @@ export class Authority extends BaseEntity {
   })
   authorityKeywords: AuthorityKeyword[];
 
-  @OneToMany(
-    () => AuthorityRelated,
-    authorityRelated => authorityRelated.authority
+  // TODO: remove AuthorityCitations, AuthorityRelated, AuthoritySuperceded models.
+  @ManyToMany(
+    () => Authority,
+    authority => authority.authorityCitedBy
   )
-  authorityRelated: AuthorityRelated[];
+  @JoinTable({
+    name: 'authorityCitations',
+    joinColumn: { name: 'authorityId', referencedColumnName: 'authorityId' },
+    inverseJoinColumn: { name: 'citedAuthorityId', referencedColumnName: 'authorityId' },
+  })
+  authorityCitations: Authority[];
 
-  // TODO: note that this relationship is undirected (e.g., 1 related to 2 => 2 related to 1); how to prevent duplicates?
+  @ManyToMany(
+    () => Authority,
+    authority => authority.authorityCitations
+  )
+  @JoinTable({
+    name: 'authorityCitations',
+    joinColumn: { name: 'citedAuthorityId', referencedColumnName: 'authorityId' },
+    inverseJoinColumn: { name: 'authorityId', referencedColumnName: 'authorityId' },
+  })
+  authorityCitedBy: Authority[];
+
+  // TODO: assuming that this relationship is undirected (e.g., 1 related to 2 => 2 related to 1), how to prevent duplicates?
   // TODO: lookup how to represent undirected graphs in SQL.
-  @OneToMany(
-    () => AuthorityRelated,
-    authorityRelated => authorityRelated.relatedAuthority
+  @ManyToMany(
+    () => Authority,
+    authority => authority.authorityRelatedDup
   )
-  authorityRelatedDup: AuthorityRelated[];
+  @JoinTable({
+    name: 'authorityRelated',
+    joinColumn: { name: 'authorityId', referencedColumnName: 'authorityId' },
+    inverseJoinColumn: { name: 'relatedAuthorityId', referencedColumnName: 'authorityId' },
+  })
+  authorityRelated: Authority[];
 
-  @OneToMany(
-    () => AuthoritySuperceded,
-    authoritySuperceded => authoritySuperceded.authority
+  @ManyToMany(
+    () => Authority,
+    authority => authority.authorityRelated
   )
-  authoritySuperceded: AuthoritySuperceded[];
+  @JoinTable({
+    name: 'authorityRelated',
+    joinColumn: { name: 'relatedAuthorityId', referencedColumnName: 'authorityId' },
+    inverseJoinColumn: { name: 'authorityId', referencedColumnName: 'authorityId' },
+  })
+  authorityRelatedDup: Authority[];
 
-  @OneToMany(
-    () => AuthoritySuperceded,
-    authoritySuperceded => authoritySuperceded.supercededAuthority
+  @ManyToMany(
+    () => Authority,
+    authority => authority.authoritySupercededBy
   )
-  authoritySupercededBy: AuthoritySuperceded[];
+  @JoinTable({
+    name: 'authoritySuperceded',
+    joinColumn: { name: 'authorityId', referencedColumnName: 'authorityId' },
+    inverseJoinColumn: { name: 'supercededAuthorityId', referencedColumnName: 'authorityId' },
+  })
+  authoritySuperceded: Authority[];
+
+  @ManyToMany(
+    () => Authority,
+    authority => authority.authoritySuperceded
+  )
+  @JoinTable({
+    name: 'authoritySuperceded',
+    joinColumn: { name: 'supercededAuthorityId', referencedColumnName: 'authorityId' },
+    inverseJoinColumn: { name: 'authorityId', referencedColumnName: 'authorityId' },
+  })
+  authoritySupercededBy: Authority[];
 }

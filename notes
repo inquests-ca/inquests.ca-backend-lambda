@@ -1,0 +1,5 @@
+TODO
+X Generate models from DB
+- Update keyword endpoint to fetch by category
+- Get date, source, citation from authority
+- Clone sample typeorm project for reference

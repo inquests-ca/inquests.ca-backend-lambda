@@ -1,4 +1,5 @@
-import { Column, Entity, BaseEntity } from 'typeorm';
+import { Column, Entity, BaseEntity, ManyToOne, JoinColumn } from 'typeorm';
+import { JurisdictionCategory } from './JurisdictionCategory';
 
 @Entity('jurisdiction')
 export class Jurisdiction extends BaseEntity {
@@ -13,4 +14,8 @@ export class Jurisdiction extends BaseEntity {
 
   @Column('tinyint', { nullable: true })
   federal: boolean | null;
+
+  @ManyToOne(() => JurisdictionCategory)
+  @JoinColumn({ name: 'jurisdictionCategoryId', referencedColumnName: 'jurisdictionCategoryId' })
+  jurisdictionCategory: JurisdictionCategory;
 }

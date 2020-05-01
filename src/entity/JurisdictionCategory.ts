@@ -1,8 +1,8 @@
 import { Column, Entity, BaseEntity } from 'typeorm';
 
-@Entity('jurisdiction_category')
+@Entity('jurisdictionCategory')
 export class JurisdictionCategory extends BaseEntity {
-  @Column('varchar', { primary: true, length: 255 })
+  @Column('char', { primary: true, length: 100 })
   jurisdictionCategoryId: string;
 
   @Column('varchar', { length: 255 })
