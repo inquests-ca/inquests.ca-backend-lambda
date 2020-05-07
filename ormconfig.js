@@ -1,5 +1,4 @@
-// TODO: rename env variables in Lambda accordingly.
-// TODO: why are there compilation errors?
+// TODO: resolve compilation errors.
 module.exports = {
   type: 'mysql',
   host: process.env.DB_HOST,
