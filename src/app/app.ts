@@ -6,6 +6,10 @@ import * as express from 'express';
 
 const app = express();
 
+const PAGINATION = 50;
+
+// TODO: change keyword to keywords.
+
 // Middleware
 app.use((req, res, next) => {
   // TODO: remove this log statement to prevent logging sensitive data.
@@ -26,9 +30,13 @@ app.get('/authority/:authorityId(\\d+)', async (req, res) => {
 });
 
 // Get all authorities, with optional search parameters and pagination
-// e.g.: /authorities?keyword[]=CRIMINAL_JUSTICE&limit=50&offset=100&jurisdiction=CAD_ON
+// e.g.: /authorities?q=People%20First&keyword[]=CRIMINAL_JUSTICE&limit=50&offset=100&jurisdiction=CAD_ON
+// TODO: rename q parameter.
 app.get('/authorities', async (req, res) => {
   const {
+    // Search
+    q,
+
     // Filtering
     keyword,
     jurisdiction,
@@ -40,11 +48,19 @@ app.get('/authorities', async (req, res) => {
     // Ordering... TODO
   } = req.query;
 
-  // TODO: create limit, offset default consts.
-  const limitParsed = parseInt(limit) >= 0 ? parseInt(limit) : 50;
+  const qParsed = q || null;
+  const keywordsParsed = keyword ? new Set<string>(keyword) : null; // Convert to Set to prevent duplication.
+  const jurisdictionParsed = jurisdiction || null;
+  const limitParsed = parseInt(limit) >= 0 ? parseInt(limit) : PAGINATION;
   const offsetParsed = parseInt(offset) >= 0 ? parseInt(offset) : 0;
-  const authorities = await getAuthorities(keyword, jurisdiction, limitParsed, offsetParsed);
-  res.json(authorities);
+  const [data, count] = await getAuthorities(
+    qParsed,
+    keywordsParsed,
+    jurisdictionParsed,
+    limitParsed,
+    offsetParsed
+  );
+  res.json({ data, count });
 });
 
 // Get inquest by ID
@@ -56,9 +72,13 @@ app.get('/inquest/:inquestId(\\d+)', async (req, res) => {
 });
 
 // Get all inquests, with optional search parameters and pagination
-// e.g.: /inquests?keyword[]=CAUSE_CRUSH&limit=50&offset=100&jurisdiction=CAD_ON
+// e.g.: /inquests?q=Smith&keyword[]=CAUSE_CRUSH&limit=50&offset=100&jurisdiction=CAD_ON
+// TODO: rename q parameter.
 app.get('/inquests', async (req, res) => {
   const {
+    // Search
+    q,
+
     // Filtering
     keyword,
     jurisdiction,
@@ -70,11 +90,19 @@ app.get('/inquests', async (req, res) => {
     // Ordering... TODO
   } = req.query;
 
-  // TODO: create limit, offset default consts.
-  const limitParsed = parseInt(limit) >= 0 ? parseInt(limit) : 50;
+  const qParsed = q || null;
+  const keywords = keyword ? new Set<string>(keyword) : null;
+  const jurisdictionParsed = jurisdiction || null;
+  const limitParsed = parseInt(limit) >= 0 ? parseInt(limit) : PAGINATION;
   const offsetParsed = parseInt(offset) >= 0 ? parseInt(offset) : 0;
-  const inquests = await getInquests(keyword, jurisdiction, limitParsed, offsetParsed);
-  res.json(inquests);
+  const [data, count] = await getInquests(
+    qParsed,
+    keywords,
+    jurisdictionParsed,
+    limitParsed,
+    offsetParsed
+  );
+  res.json({ data, count });
 });
 
 // Get all inquest keywords

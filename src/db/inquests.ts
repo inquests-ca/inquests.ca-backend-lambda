@@ -1,4 +1,3 @@
-// TODO: prune and clean up models.
 import { getRepository } from 'typeorm';
 
 import { Inquest } from '../entity/Inquest';
@@ -11,39 +10,53 @@ export const getInquestById = async (inquestId: number): Promise<Inquest> =>
     .innerJoinAndSelect('deceased.deathManner', 'deathManner')
     .innerJoinAndSelect('deceased.inquestType', 'inquestType')
     .innerJoinAndSelect('inquest.inquestDocuments', 'documents')
-    .innerJoinAndSelect('documents.documentSource', 'documentSource')
+    .innerJoinAndSelect('documents.inquestDocumentLinks', 'documentLinks')
+    .innerJoinAndSelect('documentLinks.documentSource', 'documentSource')
     .leftJoinAndSelect('inquest.authorities', 'authorities')
     .where('inquest.inquestId = :inquestId', { inquestId })
     .getOne();
 
 export const getInquests = async (
-  keywords: Array<string>,
+  q: string,
+  keywords: Set<string>,
   jurisdiction: string,
   limit: number,
   offset: number
-): Promise<Inquest[]> => {
-  // TODO: create userJurisdiction query parameter, use as input to query.
-  const query = getRepository(Inquest)
-    .createQueryBuilder('inquest')
+): Promise<[Inquest[], number]> => {
+  // TODO: create userJurisdiction query parameter, use for ordering results.
+  const qb = await getRepository(Inquest).createQueryBuilder('inquest');
+  const query = qb
     .innerJoinAndSelect('inquest.jurisdiction', 'jurisdiction')
+    .innerJoinAndSelect('inquest.deceased', 'deceased')
+    .innerJoinAndSelect('deceased.deathManner', 'deathManner')
+    .innerJoinAndSelect('deceased.inquestType', 'inquestType')
     .innerJoin('jurisdiction.jurisdictionCategory', 'jurisdictionCategory')
-    .addSelect("(inquest.jurisdictionId = 'CAD_ON')", 'userJurisdiction') // Used in ORDER BY clause
-    .addSelect("(jurisdictionCategory.jurisdictionCategoryId = 'CAD')", 'userCountry') // Used in ORDER BY clause
+    .addSelect("(jurisdictionCategory.jurisdictionCategoryId = 'CAD')", 'isCanadian') // Used for ordering
     .take(limit)
     .skip(offset)
-    .orderBy('inquest.primary', 'DESC')
-    .addOrderBy('userJurisdiction', 'DESC')
-    .addOrderBy('userCountry', 'DESC')
+    .orderBy('inquest.isPrimary', 'DESC')
+    .addOrderBy('isCanadian', 'DESC')
     .addOrderBy('inquest.start', 'DESC');
-  if (jurisdiction !== undefined)
-    query.where('jurisdiction.jurisdictionId = :jurisdiction', { jurisdiction });
-  if (keywords !== undefined)
-    query.innerJoin(
-      'inquest.inquestKeywords',
-      'keywords',
-      'keywords.inquestKeywordId IN (:keywords)',
-      { keywords }
-    );
+  if (q !== null)
+    query
+      .andWhere('MATCH (deceased.lastName, deceased.givenNames) AGAINST (:q)', { q })
+      .andWhere('MATCH (inquest.name) AGAINST (:q)', { q });
+  if (jurisdiction !== null)
+    query.andWhere('jurisdiction.jurisdictionId = :jurisdiction', { jurisdiction });
+  if (keywords !== null) {
+    // Use sub-query to get list of inquests by ID which match all provided keywords.
+    const subQuery = qb
+      .subQuery()
+      .select('keywords.inquestId')
+      .from('inquestKeywords', 'keywords')
+      .where('keywords.inquestKeywordId IN (:keywords)')
+      .groupBy('keywords.inquestId')
+      .having('COUNT(keywords.inquestId) >= (:totalKeywords)')
+      .getQuery();
+    query
+      .andWhere('inquest.inquestId IN ' + subQuery)
+      .setParameters({ keywords: Array.from(keywords), totalKeywords: keywords.size });
+  }
 
-  return query.getMany();
+  return query.getManyAndCount();
 };
