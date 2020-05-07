@@ -23,8 +23,8 @@ export class Inquest extends BaseEntity {
   @Column('char', { length: 100 })
   jurisdictionId: string;
 
-  @Column('tinyint', { nullable: true })
-  primary: boolean | null;
+  @Column('tinyint')
+  isPrimary: boolean;
 
   @Column('varchar', { length: 255 })
   name: string;
@@ -32,17 +32,17 @@ export class Inquest extends BaseEntity {
   @Column('varchar', { nullable: true, length: 255 })
   overview: string | null;
 
-  @Column('varchar', { nullable: true, length: 10000 })
-  synopsis: string | null;
+  @Column('varchar', { length: 5000 })
+  synopsis: string;
 
   @Column('varchar', { nullable: true, length: 1000 })
   notes: string | null;
 
-  @Column('varchar', { nullable: true, length: 255 })
-  presidingOfficer: string | null;
+  @Column('varchar', { length: 255 })
+  presidingOfficer: string;
 
-  @Column('date', { nullable: true })
-  start: string | null;
+  @Column('date')
+  start: string;
 
   @Column('date', { nullable: true })
   end: string | null;
@@ -52,6 +52,9 @@ export class Inquest extends BaseEntity {
 
   @Column('int', { nullable: true })
   exhibits: number | null;
+
+  @Column('varchar', { nullable: true, length: 1000 })
+  remarks: string | null;
 
   @ManyToMany(
     () => Authority,

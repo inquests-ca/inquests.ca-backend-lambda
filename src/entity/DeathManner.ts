@@ -5,6 +5,6 @@ export class DeathManner extends BaseEntity {
   @Column('char', { primary: true, length: 100 })
   deathMannerId: string;
 
-  @Column('varchar', { nullable: true, length: 255 })
-  name: string | null;
+  @Column('varchar', { length: 255 })
+  name: string;
 }

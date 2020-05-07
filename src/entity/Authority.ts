@@ -16,23 +16,26 @@ export class Authority extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   authorityId: number;
 
-  @Column('tinyint', { nullable: true })
-  primary: boolean | null;
+  @Column('tinyint')
+  isPrimary: boolean;
 
-  @Column('varchar', { nullable: true, length: 255 })
-  name: string | null;
+  @Column('varchar', { length: 255 })
+  name: string;
 
-  @Column('varchar', { nullable: true, length: 255 })
-  overview: string | null;
+  @Column('varchar', { length: 255 })
+  overview: string;
 
-  @Column('varchar', { nullable: true, length: 10000 })
-  synopsis: string | null;
+  @Column('varchar', { length: 5000 })
+  synopsis: string;
 
-  @Column('varchar', { nullable: true, length: 10000 })
+  @Column('varchar', { nullable: true, length: 5000 })
   quotes: string | null;
 
   @Column('varchar', { nullable: true, length: 1000 })
   notes: string | null;
+
+  @Column('varchar', { nullable: true, length: 1000 })
+  remarks: string | null;
 
   @OneToMany(
     () => AuthorityDocument,
@@ -55,10 +58,10 @@ export class Authority extends BaseEntity {
   @JoinTable({
     name: 'authorityKeywords',
     joinColumn: { name: 'authorityId', referencedColumnName: 'authorityId' },
+    inverseJoinColumn: { name: 'authorityKeywordId', referencedColumnName: 'authorityKeywordId' },
   })
   authorityKeywords: AuthorityKeyword[];
 
-  // TODO: remove AuthorityCitations, AuthorityRelated, AuthoritySuperceded models.
   @ManyToMany(
     () => Authority,
     authority => authority.authorityCitedBy
@@ -81,11 +84,9 @@ export class Authority extends BaseEntity {
   })
   authorityCitedBy: Authority[];
 
-  // TODO: assuming that this relationship is undirected (e.g., 1 related to 2 => 2 related to 1), how to prevent duplicates?
-  // TODO: lookup how to represent undirected graphs in SQL.
   @ManyToMany(
     () => Authority,
-    authority => authority.authorityRelatedDup
+    authority => authority.authorityRelatedBy
   )
   @JoinTable({
     name: 'authorityRelated',
@@ -103,7 +104,7 @@ export class Authority extends BaseEntity {
     joinColumn: { name: 'relatedAuthorityId', referencedColumnName: 'authorityId' },
     inverseJoinColumn: { name: 'authorityId', referencedColumnName: 'authorityId' },
   })
-  authorityRelatedDup: Authority[];
+  authorityRelatedBy: Authority[];
 
   @ManyToMany(
     () => Authority,

@@ -8,20 +8,20 @@ export class Deceased extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   deceasedId: number;
 
-  @Column('int', { nullable: true, unsigned: true })
-  inquestId: number | null;
+  @Column('int', { unsigned: true })
+  inquestId: number;
 
-  @Column('char', { nullable: true, length: 100 })
-  inquestTypeId: string | null;
+  @Column('char', { length: 100 })
+  inquestTypeId: string;
 
-  @Column('char', { nullable: true, length: 100 })
-  deathMannerId: string | null;
+  @Column('char', { length: 100 })
+  deathMannerId: string;
 
-  @Column('varchar', { nullable: true, length: 255 })
-  deathCause: string | null;
+  @Column('varchar', { length: 255 })
+  deathCause: string;
 
-  @Column('date', { nullable: true })
-  deathDate: string | null;
+  @Column('date')
+  deathDate: string;
 
   @Column('varchar', { nullable: true, length: 255 })
   lastName: string | null;

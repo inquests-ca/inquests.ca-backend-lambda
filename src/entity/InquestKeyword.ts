@@ -6,8 +6,8 @@ export class InquestKeyword extends BaseEntity {
   @Column('char', { primary: true, length: 100 })
   inquestKeywordId: string;
 
-  @Column('char', { nullable: true, length: 100 })
-  inquestCategoryId: string | null;
+  @Column('char', { length: 100 })
+  inquestCategoryId: string;
 
   @Column('varchar', { unique: true, length: 255 })
   name: string;

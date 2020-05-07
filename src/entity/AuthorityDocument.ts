@@ -23,14 +23,14 @@ export class AuthorityDocument extends BaseEntity {
   @Column('char', { nullable: true, length: 100 })
   authorityDocumentTypeId: string | null;
 
-  @Column('char', { nullable: true, length: 100 })
-  sourceId: string | null;
+  @Column('char', { length: 100 })
+  sourceId: string;
 
-  @Column('tinyint', { nullable: true })
-  primary: boolean | null;
+  @Column('tinyint')
+  isPrimary: boolean;
 
-  @Column('varchar', { nullable: true, length: 255 })
-  name: string | null;
+  @Column('varchar', { length: 255 })
+  name: string;
 
   @Column('varchar', { nullable: true, length: 255 })
   citation: string | null;

@@ -5,9 +5,9 @@ export class InquestType extends BaseEntity {
   @Column('char', { primary: true, length: 100 })
   inquestTypeId: string;
 
-  @Column('varchar', { nullable: true, length: 255 })
-  name: string | null;
+  @Column('varchar', { length: 255 })
+  name: string;
 
   @Column('tinyint', { unsigned: true })
-  mandatory: boolean;
+  isMandatory: boolean;
 }

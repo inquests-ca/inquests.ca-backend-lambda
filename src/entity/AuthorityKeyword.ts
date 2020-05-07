@@ -6,8 +6,8 @@ export class AuthorityKeyword extends BaseEntity {
   @Column('char', { primary: true, length: 100 })
   authorityKeywordId: string;
 
-  @Column('char', { nullable: true, length: 100 })
-  authorityCategoryId: string | null;
+  @Column('char', { length: 100 })
+  authorityCategoryId: string;
 
   @Column('varchar', { unique: true, length: 255 })
   name: string;

@@ -8,6 +8,6 @@ export class DocumentSource extends BaseEntity {
   @Column('varchar', { length: 255 })
   name: string;
 
-  @Column('tinyint', { nullable: true })
-  hasPaywall: boolean | null;
+  @Column('tinyint')
+  isFree: boolean;
 }
