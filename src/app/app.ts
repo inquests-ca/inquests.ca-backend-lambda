@@ -22,7 +22,7 @@ app.use((req, res, next) => {
 // TODO: move routes to separate files.
 
 // Get authority by ID
-app.get('/authority/:authorityId(\\d+)', async (req, res) => {
+app.get('/authorities/:authorityId(\\d+)', async (req, res) => {
   const { authorityId } = req.params;
   const authority = await getAuthorityById(authorityId);
   if (authority === undefined) res.status(404).send('Authority not found');
@@ -64,7 +64,7 @@ app.get('/authorities', async (req, res) => {
 });
 
 // Get inquest by ID
-app.get('/inquest/:inquestId(\\d+)', async (req, res) => {
+app.get('/inquests/:inquestId(\\d+)', async (req, res) => {
   const { inquestId } = req.params;
   const inquest = await getInquestById(inquestId);
   if (inquest === undefined) res.status(404).send('Inquest not found');
