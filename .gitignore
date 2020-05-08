@@ -1,6 +1,5 @@
 .DS_Store
 
-run.sh
 node_modules/*
 build/*
 
