@@ -8,14 +8,12 @@ import awsServerlessExpress = require('aws-serverless-express');
 const server = awsServerlessExpress.createServer(app);
 
 const initConnection = async (): Promise<void> => {
-  console.log('Getting secret');
   const connectionSecretString = await getSecret('prod/inquests.ca/MySQL');
-  console.log(`SECRET: ${connectionSecretString}`);
   let connectionSecret;
   try {
-    connectionSecret = JSON.parse(connectionSecret);
+    connectionSecret = JSON.parse(connectionSecretString);
   } catch (err) {
-    console.log(`Could not parse connection secret object: ${err.message()}`);
+    console.log('Failed to parse connection secret object.');
     return;
   }
   const connectionOptions: ConnectionOptions = {
@@ -34,7 +32,6 @@ const initConnection = async (): Promise<void> => {
 
 const handler = (event, context): void => {
   // TODO: should initConnection be outside the handler function?
-  console.log('Creating handler');
   initConnection().then(() => {
     awsServerlessExpress.proxy(server, event, context);
   });
