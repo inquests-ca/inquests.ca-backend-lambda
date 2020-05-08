@@ -8,6 +8,6 @@ module.exports = {
   database: process.env.DB_DATABASE,
   synchronize: false,
   logging: process.env.DEBUG,
-  entities: ['build/entity/**/*.js'],
+  entities: ['entity/**/*.js'],
   cli: { entitiesDir: 'src/entity' },
 };

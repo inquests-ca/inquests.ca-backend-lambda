@@ -6,7 +6,7 @@ import awsServerlessExpress = require('aws-serverless-express');
 
 const server = awsServerlessExpress.createServer(app);
 
-const handler = (event, context) => {
+const handler = (event, context): void => {
   createConnection().then(() => {
     awsServerlessExpress.proxy(server, event, context);
   });
