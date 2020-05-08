@@ -36,7 +36,7 @@ jobs:
       - name: Create zip deployment package
         run: |
           cd ./build
-          zip -r ../build.zip . ../node_modules ../ormconfig.js
+          zip -r ../build.zip . ../node_modules
 
       - name: Copy zip deployment package to AWS S3
         run: |
