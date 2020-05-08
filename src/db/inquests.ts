@@ -1,9 +1,10 @@
-import { getRepository } from 'typeorm';
-
+import { getConnection } from '../utils/db';
 import { Inquest } from '../entity/Inquest';
 
-export const getInquestById = async (inquestId: number): Promise<Inquest> =>
-  getRepository(Inquest)
+export const getInquestById = async (inquestId: number): Promise<Inquest> => {
+  const connection = await getConnection();
+  return connection
+    .getRepository(Inquest)
     .createQueryBuilder('inquest')
     .innerJoinAndSelect('inquest.jurisdiction', 'jurisdiction')
     .innerJoinAndSelect('inquest.deceased', 'deceased')
@@ -15,6 +16,7 @@ export const getInquestById = async (inquestId: number): Promise<Inquest> =>
     .leftJoinAndSelect('inquest.authorities', 'authorities')
     .where('inquest.inquestId = :inquestId', { inquestId })
     .getOne();
+};
 
 export const getInquests = async (
   q: string,
@@ -24,7 +26,8 @@ export const getInquests = async (
   offset: number
 ): Promise<[Inquest[], number]> => {
   // TODO: create userJurisdiction query parameter, use for ordering results.
-  const qb = await getRepository(Inquest).createQueryBuilder('inquest');
+  const connection = await getConnection();
+  const qb = await connection.getRepository(Inquest).createQueryBuilder('inquest');
   const query = qb
     .innerJoinAndSelect('inquest.jurisdiction', 'jurisdiction')
     .innerJoinAndSelect('inquest.deceased', 'deceased')
