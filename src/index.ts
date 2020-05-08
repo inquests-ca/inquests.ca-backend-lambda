@@ -8,6 +8,7 @@ import awsServerlessExpress = require('aws-serverless-express');
 const server = awsServerlessExpress.createServer(app);
 
 const initConnection = async (): Promise<void> => {
+  console.log('Getting secret');
   const connectionSecretString = await getSecret('prod/inquests.ca/MySQL');
   console.log(`SECRET: ${connectionSecretString}`);
   let connectionSecret;
@@ -33,6 +34,7 @@ const initConnection = async (): Promise<void> => {
 
 const handler = (event, context): void => {
   // TODO: should initConnection be outside the handler function?
+  console.log('Creating handler');
   initConnection().then(() => {
     awsServerlessExpress.proxy(server, event, context);
   });
