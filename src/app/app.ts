@@ -12,7 +12,7 @@ app.use((req, res, next) => {
   // TODO: remove this log statement to prevent logging sensitive data.
   if (process.env.DEBUG)
     console.log('Received request with body: ', JSON.stringify(req.body, null, 2));
-  const origin = process.env.ENV === 'dev' ? 'http://localhost:3000' : 'http://inquests.ca';
+  const origin = process.env.ENV === 'dev' ? 'http://localhost:3000' : 'https://inquests.ca';
   res.set('Access-Control-Allow-Origin', origin);
 
   next();
