@@ -11,8 +11,8 @@ export const getInquestById = async (inquestId: number): Promise<Inquest> => {
     .innerJoinAndSelect('deceased.deathManner', 'deathManner')
     .innerJoinAndSelect('deceased.inquestType', 'inquestType')
     .innerJoinAndSelect('inquest.inquestDocuments', 'documents')
-    .innerJoinAndSelect('documents.inquestDocumentLinks', 'documentLinks')
-    .innerJoinAndSelect('documentLinks.documentSource', 'documentSource')
+    .leftJoinAndSelect('documents.inquestDocumentLinks', 'documentLinks')
+    .leftJoinAndSelect('documentLinks.documentSource', 'documentSource')
     .leftJoinAndSelect('inquest.authorities', 'authorities')
     .where('inquest.inquestId = :inquestId', { inquestId })
     .getOne();
