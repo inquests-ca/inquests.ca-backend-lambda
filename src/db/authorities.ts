@@ -1,13 +1,12 @@
+import { getRepository } from 'typeorm';
+
 // TODO: prune and clean up models.
-import { getConnection } from '../utils/db';
 import { Authority } from '../entity/Authority';
 
-export const getAuthorityById = async (authorityId: number): Promise<Authority> => {
+export const getAuthorityById = async (authorityId: number): Promise<Authority> =>
   // TODO: authority document type.
   // TODO: use innerJoinAndMapOne where appropriate.
-  const connection = await getConnection();
-  return connection
-    .getRepository(Authority)
+  getRepository(Authority)
     .createQueryBuilder('authority')
     .innerJoinAndSelect('authority.authorityDocuments', 'documents')
     .innerJoinAndSelect('documents.source', 'source')
@@ -21,7 +20,6 @@ export const getAuthorityById = async (authorityId: number): Promise<Authority> 
     .leftJoinAndSelect('authority.inquests', 'inquests')
     .where('authority.authorityId = :authorityId', { authorityId })
     .getOne();
-};
 
 export const getAuthorities = async (
   q: string | null,
@@ -31,8 +29,7 @@ export const getAuthorities = async (
   offset: number
 ): Promise<[Authority[], number]> => {
   // TODO: create userJurisdiction query parameter, use for ordering results.
-  const connection = await getConnection();
-  const qb = await connection.getRepository(Authority).createQueryBuilder('authority');
+  const qb = await getRepository(Authority).createQueryBuilder('authority');
   const query = qb
     .innerJoinAndSelect(
       'authority.authorityDocuments',
