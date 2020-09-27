@@ -19,11 +19,12 @@ app.use((req, res, next) => {
 });
 
 // TODO: move routes to separate files.
+// TODO: resolve type issues.
 
 // Get authority by ID
 app.get('/authorities/:authorityId(\\d+)', async (req, res) => {
   const { authorityId } = req.params;
-  const authority = await getAuthorityById(authorityId);
+  const authority = await getAuthorityById(parseInt(authorityId));
   if (authority === undefined) res.status(404).send('Authority not found');
   else res.json(authority);
 });
@@ -46,11 +47,11 @@ app.get('/authorities', async (req, res) => {
     // Ordering... TODO
   } = req.query;
 
-  const textParsed = text || null;
-  const keywordsParsed = keywords ? new Set<string>(keywords.split('__')) : null; // Convert to Set to prevent duplication.
-  const jurisdictionParsed = jurisdiction || null;
-  const limitParsed = parseInt(limit) >= 0 ? parseInt(limit) : PAGINATION;
-  const offsetParsed = parseInt(offset) >= 0 ? parseInt(offset) : 0;
+  const textParsed = (text as string) || null;
+  const keywordsParsed = keywords ? new Set<string>((keywords as string).split('__')) : null; // Convert to Set to prevent duplication.
+  const jurisdictionParsed = (jurisdiction as string) || null;
+  const limitParsed = parseInt(limit as string) >= 0 ? parseInt(limit as string) : PAGINATION;
+  const offsetParsed = parseInt(offset as string) >= 0 ? parseInt(offset as string) : 0;
   const [data, count] = await getAuthorities(
     textParsed,
     keywordsParsed,
@@ -64,7 +65,7 @@ app.get('/authorities', async (req, res) => {
 // Get inquest by ID
 app.get('/inquests/:inquestId(\\d+)', async (req, res) => {
   const { inquestId } = req.params;
-  const inquest = await getInquestById(inquestId);
+  const inquest = await getInquestById(parseInt(inquestId));
   if (inquest === undefined) res.status(404).send('Inquest not found');
   else res.json(inquest);
 });
@@ -87,11 +88,11 @@ app.get('/inquests', async (req, res) => {
     // Ordering... TODO
   } = req.query;
 
-  const textParsed = text || null;
-  const keywordsParsed = keywords ? new Set<string>(keywords.split('__')) : null;
-  const jurisdictionParsed = jurisdiction || null;
-  const limitParsed = parseInt(limit) >= 0 ? parseInt(limit) : PAGINATION;
-  const offsetParsed = parseInt(offset) >= 0 ? parseInt(offset) : 0;
+  const textParsed = (text as string) || null;
+  const keywordsParsed = keywords ? new Set<string>((keywords as string).split('__')) : null;
+  const jurisdictionParsed = (jurisdiction as string) || null;
+  const limitParsed = parseInt(limit as string) >= 0 ? parseInt(limit as string) : PAGINATION;
+  const offsetParsed = parseInt(offset as string) >= 0 ? parseInt(offset as string) : 0;
   const [data, count] = await getInquests(
     textParsed,
     keywordsParsed,
