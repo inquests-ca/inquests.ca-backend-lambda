@@ -19,5 +19,9 @@
     "prettier": "^1.19.1",
     "typeorm-model-generator": "^0.4.2",
     "typescript": "^3.8.2"
+  },
+  "scripts": {
+    "start": "node build/index.js",
+    "build": "npx tsc -p tsconfig.json"
   }
 }
