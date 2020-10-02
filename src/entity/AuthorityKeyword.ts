@@ -1,9 +1,9 @@
-import { Column, Entity, JoinColumn, ManyToOne, BaseEntity } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, BaseEntity, PrimaryColumn } from 'typeorm';
 import { AuthorityCategory } from './AuthorityCategory';
 
 @Entity('authorityKeyword')
 export class AuthorityKeyword extends BaseEntity {
-  @Column('char', { primary: true, length: 100 })
+  @PrimaryColumn('char', { length: 100 })
   authorityKeywordId: string;
 
   @Column('char', { length: 100 })

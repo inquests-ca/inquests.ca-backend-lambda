@@ -1,9 +1,9 @@
-import { Column, Entity, JoinColumn, ManyToOne, BaseEntity } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, BaseEntity, PrimaryColumn } from 'typeorm';
 import { InquestCategory } from './InquestCategory';
 
 @Entity('inquestKeyword')
 export class InquestKeyword extends BaseEntity {
-  @Column('char', { primary: true, length: 100 })
+  @PrimaryColumn('char', { length: 100 })
   inquestKeywordId: string;
 
   @Column('char', { length: 100 })

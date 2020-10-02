@@ -16,7 +16,7 @@ export class Authority extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   authorityId: number;
 
-  @Column('tinyint')
+  @Column('tinyint', { unsigned: true })
   isPrimary: boolean;
 
   @Column('varchar', { length: 255 })
