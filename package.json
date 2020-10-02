@@ -2,6 +2,11 @@
   "name": "inquests-ca-backend-lambda",
   "version": "0.0.1",
   "description": "Backend for inquests.ca, deployed on AWS Lambda.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/inquests-ca/inquests.ca-backend-lambda.git"
+  },
   "dependencies": {
     "@types/express": "^4.17.8",
     "express": "^4.17.1",
