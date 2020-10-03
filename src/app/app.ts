@@ -9,12 +9,9 @@ const PAGINATION = 50;
 
 // Middleware
 app.use((req, res, next) => {
-  // TODO: remove this log statement to prevent logging sensitive data.
-  if (process.env.DEBUG)
-    console.log('Received request with body: ', JSON.stringify(req.body, null, 2));
-  const origin = process.env.ENV === 'dev' ? 'http://localhost:3000' : 'https://inquests.ca';
-  res.set('Access-Control-Allow-Origin', origin);
-
+  const allowedOrigins = ['http://localhost:3000', 'https://inquests.ca'];
+  const origin = Array.isArray(req.headers.origin) ? req.headers.origin[0] : req.headers.origin;
+  if (origin && allowedOrigins.indexOf(origin) > -1) res.set('Access-Control-Allow-Origin', origin);
   next();
 });
 
