@@ -1,14 +1,11 @@
-console.log('Loading function');
+// TODO: only enable locally.
+require('dotenv').config();
+
+import { createConnection } from 'typeorm';
 
 import app from './app/app';
-import awsServerlessExpress = require('aws-serverless-express');
 
-// TODO: initialize db connection here?
+// PORT env variable is provided by Heroku
+const port = process.env.PORT || 9000;
 
-const server = awsServerlessExpress.createServer(app);
-
-const handler = (event, context): void => {
-  awsServerlessExpress.proxy(server, event, context);
-};
-
-exports.handler = handler;
+createConnection().then(() => app.listen(port, () => console.log(`Listening on port ${port}`)));

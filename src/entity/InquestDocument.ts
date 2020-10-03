@@ -11,7 +11,7 @@ import { InquestDocumentType } from './InquestDocumentType';
 import { Inquest } from './Inquest';
 import { InquestDocumentLinks } from './InquestDocumentLinks';
 
-@Entity('inquestDocument', { schema: 'inquestsca' })
+@Entity('inquestDocument')
 export class InquestDocument extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   inquestDocumentId: number;

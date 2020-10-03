@@ -26,7 +26,7 @@ export class AuthorityDocument extends BaseEntity {
   @Column('char', { length: 100 })
   sourceId: string;
 
-  @Column('tinyint')
+  @Column('tinyint', { unsigned: true })
   isPrimary: boolean;
 
   @Column('varchar', { length: 255 })

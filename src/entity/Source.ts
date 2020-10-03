@@ -1,10 +1,18 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, BaseEntity } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  BaseEntity,
+  PrimaryColumn,
+} from 'typeorm';
 import { AuthorityDocument } from './AuthorityDocument';
 import { Jurisdiction } from './Jurisdiction';
 
 @Entity('source')
 export class Source extends BaseEntity {
-  @Column('char', { primary: true, length: 100 })
+  @PrimaryColumn('char', { length: 100 })
   sourceId: string;
 
   @Column('char', { nullable: true, length: 100 })

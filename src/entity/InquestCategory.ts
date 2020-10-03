@@ -1,9 +1,9 @@
-import { Column, Entity, OneToMany, BaseEntity } from 'typeorm';
+import { Column, Entity, OneToMany, BaseEntity, PrimaryColumn } from 'typeorm';
 import { InquestKeyword } from './InquestKeyword';
 
 @Entity('inquestCategory')
 export class InquestCategory extends BaseEntity {
-  @Column('char', { primary: true, length: 100 })
+  @PrimaryColumn('char', { length: 100 })
   inquestCategoryId: string;
 
   @Column('varchar', { unique: true, length: 255 })

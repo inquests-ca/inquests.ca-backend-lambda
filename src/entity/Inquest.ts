@@ -23,7 +23,7 @@ export class Inquest extends BaseEntity {
   @Column('char', { length: 100 })
   jurisdictionId: string;
 
-  @Column('tinyint')
+  @Column('tinyint', { unsigned: true })
   isPrimary: boolean;
 
   @Column('varchar', { length: 255 })

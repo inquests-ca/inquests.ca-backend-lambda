@@ -1,8 +1,8 @@
-import { Column, Entity, BaseEntity } from 'typeorm';
+import { Column, Entity, BaseEntity, PrimaryColumn } from 'typeorm';
 
 @Entity('inquestDocumentType')
 export class InquestDocumentType extends BaseEntity {
-  @Column('char', { primary: true, length: 100 })
+  @PrimaryColumn('char', { length: 100 })
   inquestDocumentTypeId: string;
 
   @Column('varchar', { name: 'name', length: 255 })

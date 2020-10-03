@@ -1,8 +1,8 @@
-import { Column, Entity, BaseEntity } from 'typeorm';
+import { Column, Entity, BaseEntity, PrimaryColumn } from 'typeorm';
 
 @Entity('deathManner')
 export class DeathManner extends BaseEntity {
-  @Column('char', { primary: true, length: 100 })
+  @PrimaryColumn('char', { length: 100 })
   deathMannerId: string;
 
   @Column('varchar', { length: 255 })
