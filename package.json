@@ -1,7 +1,7 @@
 {
   "name": "inquests-ca-backend-lambda",
   "version": "0.0.1",
-  "description": "Backend for inquests.ca, deployed on AWS Lambda.",
+  "description": "Backend for inquests.ca, deployed on Heroku.",
   "license": "MIT",
   "repository": {
     "type": "git",
