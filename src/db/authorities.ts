@@ -51,8 +51,7 @@ export const getAuthorities = async (
   if (q !== null)
     q.split(' ').forEach((term, i) => {
       if (term)
-        // TODO: search by citation.
-        query.andWhere(`authority.name REGEXP :regexp${i}`, {
+        query.andWhere(`CONCAT(authority.name, ' ', primaryDocument.citation) REGEXP :regexp${i}`, {
           // Match start of string or non-word character followed by search term.
           [`regexp${i}`]: `(^|[^a-zA-Z])${escapeRegex(term)}`
         });
