@@ -1,13 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  BaseEntity,
-  PrimaryColumn,
-} from 'typeorm';
-import { AuthorityDocument } from './AuthorityDocument';
+import { Column, Entity, JoinColumn, ManyToOne, BaseEntity, PrimaryColumn } from 'typeorm';
 import { Jurisdiction } from './Jurisdiction';
 
 @Entity('source')
@@ -26,12 +17,6 @@ export class Source extends BaseEntity {
 
   @Column('int', { unsigned: true })
   rank: number;
-
-  @OneToMany(
-    () => AuthorityDocument,
-    authorityDocument => authorityDocument.source
-  )
-  authorityDocuments: AuthorityDocument[];
 
   @ManyToOne(() => Jurisdiction)
   @JoinColumn({ name: 'jurisdictionId', referencedColumnName: 'jurisdictionId' })
