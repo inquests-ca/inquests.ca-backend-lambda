@@ -45,7 +45,7 @@ export const getInquests = async (
           `CONCAT(inquest.name, ' ', deceased.lastName, ' ', deceased.givenNames) REGEXP :regexp${i}`,
           {
             // Match start of string or non-word character followed by search term.
-            [`regexp${i}`]: `(^|[^a-zA-Z])${escapeRegex(term)}`
+            [`regexp${i}`]: `(^|[^A-Za-z0-9])${escapeRegex(term)}`,
           }
         );
     });

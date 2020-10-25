@@ -53,7 +53,7 @@ export const getAuthorities = async (
       if (term)
         query.andWhere(`CONCAT(authority.name, ' ', primaryDocument.citation) REGEXP :regexp${i}`, {
           // Match start of string or non-word character followed by search term.
-          [`regexp${i}`]: `(^|[^a-zA-Z])${escapeRegex(term)}`
+          [`regexp${i}`]: `(^|[^A-Za-z0-9])${escapeRegex(term)}`,
         });
     });
   if (jurisdiction !== null)
