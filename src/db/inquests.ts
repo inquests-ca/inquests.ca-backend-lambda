@@ -1,6 +1,7 @@
 import { getRepository } from 'typeorm';
 
 import { Inquest } from '../entity/Inquest';
+import { escapeRegex } from '../utils/sql';
 
 export const getInquestById = async (inquestId: number): Promise<Inquest> =>
   getRepository(Inquest)
@@ -38,9 +39,16 @@ export const getInquests = async (
     .addOrderBy('isCanadian', 'DESC')
     .addOrderBy('inquest.start', 'DESC');
   if (q !== null)
-    query
-      .andWhere('MATCH (deceased.lastName, deceased.givenNames) AGAINST (:q)', { q })
-      .andWhere('MATCH (inquest.name) AGAINST (:q)', { q });
+    q.split(/\s+/).forEach((term, i) => {
+      if (term)
+        query.andWhere(
+          `CONCAT(inquest.name, ' ', deceased.lastName, ' ', deceased.givenNames) REGEXP :regexp${i}`,
+          {
+            // Match start of string or non-word character followed by search term.
+            [`regexp${i}`]: `(^|[^A-Za-z0-9])${escapeRegex(term)}`,
+          }
+        );
+    });
   if (jurisdiction !== null)
     query.andWhere('jurisdiction.jurisdictionId = :jurisdiction', { jurisdiction });
   if (keywords !== null) {
@@ -54,7 +62,7 @@ export const getInquests = async (
       .having('COUNT(keywords.inquestId) >= (:totalKeywords)')
       .getQuery();
     query
-      .andWhere('inquest.inquestId IN ' + subQuery)
+      .andWhere(`inquest.inquestId IN ${subQuery}`)
       .setParameters({ keywords: Array.from(keywords), totalKeywords: keywords.size });
   }
 

@@ -37,7 +37,7 @@ export class InquestDocument extends BaseEntity {
     inquestDocumentLink => inquestDocumentLink.inquestDocument
   )
   @JoinColumn({ name: 'inquestDocumentTypeId', referencedColumnName: 'inquestDocumentTypeId' })
-  inquestDocumentLinks: InquestDocumentLinks;
+  inquestDocumentLinks: InquestDocumentLinks[];
 
   @ManyToOne(
     () => Inquest,

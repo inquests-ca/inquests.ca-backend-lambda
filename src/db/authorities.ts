@@ -1,7 +1,7 @@
 import { getRepository } from 'typeorm';
 
-// TODO: prune and clean up models.
 import { Authority } from '../entity/Authority';
+import { escapeRegex } from '../utils/sql';
 
 export const getAuthorityById = async (authorityId: number): Promise<Authority> =>
   // TODO: authority document type.
@@ -48,8 +48,14 @@ export const getAuthorities = async (
     .addOrderBy('isCanadian', 'DESC')
     .addOrderBy('source.rank', 'DESC')
     .addOrderBy('primaryDocument.created', 'DESC');
-  // TODO: reduce lower bound on word length for MySQL fulltext search.
-  if (q !== null) query.andWhere('MATCH (authority.name) AGAINST (:q)', { q });
+  if (q !== null)
+    q.split(/\s+/).forEach((term, i) => {
+      if (term)
+        query.andWhere(`CONCAT(authority.name, ' ', primaryDocument.citation) REGEXP :regexp${i}`, {
+          // Match start of string or non-word character followed by search term.
+          [`regexp${i}`]: `(^|[^A-Za-z0-9])${escapeRegex(term)}`,
+        });
+    });
   if (jurisdiction !== null)
     query.andWhere('source.jurisdiction = :jurisdiction', { jurisdiction });
   if (keywords !== null) {
@@ -63,7 +69,7 @@ export const getAuthorities = async (
       .having('COUNT(keywords.authorityId) >= (:totalKeywords)')
       .getQuery();
     query
-      .andWhere('authority.authorityId IN ' + subQuery)
+      .andWhere(`authority.authorityId IN ${subQuery}`)
       .setParameters({ keywords: Array.from(keywords), totalKeywords: keywords.size });
   }
 
