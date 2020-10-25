@@ -39,7 +39,7 @@ export const getInquests = async (
     .addOrderBy('isCanadian', 'DESC')
     .addOrderBy('inquest.start', 'DESC');
   if (q !== null)
-    q.split(' ').forEach((term, i) => {
+    q.split(/\s+/).forEach((term, i) => {
       if (term)
         query.andWhere(
           `CONCAT(inquest.name, ' ', deceased.lastName, ' ', deceased.givenNames) REGEXP :regexp${i}`,

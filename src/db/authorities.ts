@@ -49,7 +49,7 @@ export const getAuthorities = async (
     .addOrderBy('source.rank', 'DESC')
     .addOrderBy('primaryDocument.created', 'DESC');
   if (q !== null)
-    q.split(' ').forEach((term, i) => {
+    q.split(/\s+/).forEach((term, i) => {
       if (term)
         query.andWhere(`CONCAT(authority.name, ' ', primaryDocument.citation) REGEXP :regexp${i}`, {
           // Match start of string or non-word character followed by search term.
