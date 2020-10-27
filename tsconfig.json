@@ -6,6 +6,7 @@
     "target": "es5",
     "module": "commonjs",
     "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true
   },
