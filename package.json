@@ -50,6 +50,9 @@
       "node": true,
       "es6": true
     },
+    "ignorePatterns": [
+      "dist/"
+    ],
     "rules": {
       "no-useless-return": "warn",
       "prefer-const": [
