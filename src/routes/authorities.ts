@@ -1,6 +1,7 @@
 import express from 'express';
+import { getCustomRepository } from 'typeorm';
 
-import { getAuthorityById, getAuthorities } from '../dao/authorities';
+import { AuthorityRepository } from '../dao/authority';
 import { PAGINATION } from '../constants';
 
 const router = express.Router();
@@ -8,7 +9,9 @@ const router = express.Router();
 // Get authority by ID
 router.get('/:authorityId(\\d+)', async (req, res) => {
   const { authorityId } = req.params;
-  const authority = await getAuthorityById(parseInt(authorityId));
+  const authority = await getCustomRepository(AuthorityRepository).getAuthorityById(
+    parseInt(authorityId)
+  );
   if (authority === undefined) res.status(404).send('Authority not found');
   else res.json(authority);
 });
@@ -36,7 +39,7 @@ router.get('/', async (req, res) => {
   const jurisdictionParsed = (jurisdiction as string) || null;
   const limitParsed = parseInt(limit as string) >= 0 ? parseInt(limit as string) : PAGINATION;
   const offsetParsed = parseInt(offset as string) >= 0 ? parseInt(offset as string) : 0;
-  const [data, count] = await getAuthorities(
+  const [data, count] = await getCustomRepository(AuthorityRepository).getAuthorities(
     textParsed,
     keywordsParsed,
     jurisdictionParsed,

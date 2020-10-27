@@ -1,6 +1,7 @@
 import express from 'express';
+import { getCustomRepository } from 'typeorm';
 
-import { getInquestById, getInquests } from '../dao/inquests';
+import { InquestRepository } from '../dao/inquest';
 import { PAGINATION } from '../constants';
 
 const router = express.Router();
@@ -8,7 +9,7 @@ const router = express.Router();
 // Get inquest by ID
 router.get('/:inquestId(\\d+)', async (req, res) => {
   const { inquestId } = req.params;
-  const inquest = await getInquestById(parseInt(inquestId));
+  const inquest = await getCustomRepository(InquestRepository).getInquestById(parseInt(inquestId));
   if (inquest === undefined) res.status(404).send('Inquest not found');
   else res.json(inquest);
 });
@@ -36,7 +37,7 @@ router.get('/', async (req, res) => {
   const jurisdictionParsed = (jurisdiction as string) || null;
   const limitParsed = parseInt(limit as string) >= 0 ? parseInt(limit as string) : PAGINATION;
   const offsetParsed = parseInt(offset as string) >= 0 ? parseInt(offset as string) : 0;
-  const [data, count] = await getInquests(
+  const [data, count] = await getCustomRepository(InquestRepository).getInquests(
     textParsed,
     keywordsParsed,
     jurisdictionParsed,
