@@ -1,7 +1,7 @@
 import express from 'express';
 
-import { getAuthorityById, getAuthorities } from '../db/authorities';
-import { PAGINATION } from '../common/constants';
+import { getAuthorityById, getAuthorities } from '../dao/authorities';
+import { PAGINATION } from '../constants';
 
 const router = express.Router();
 

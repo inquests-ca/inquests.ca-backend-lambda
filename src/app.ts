@@ -2,9 +2,9 @@ import express from 'express';
 import createError from 'http-errors';
 import morgan from 'morgan';
 
-import authoritiesRouter from '../routes/authorities';
-import inquestsRouter from '../routes/inquests';
-import keywordsRouter from '../routes/keywords';
+import authoritiesRouter from './routes/authorities';
+import inquestsRouter from './routes/inquests';
+import keywordsRouter from './routes/keywords';
 
 const app = express();
 

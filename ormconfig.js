@@ -3,6 +3,6 @@ module.exports = {
   url: process.env.DATABASE_URL,
   synchronize: false,
   logging: false,
-  entities: ['dist/entity/**/*.js'],
-  cli: { entitiesDir: 'src/entity' },
+  entities: ['dist/models/**/*.js'],
+  cli: { entitiesDir: 'src/models' },
 };

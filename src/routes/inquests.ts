@@ -1,7 +1,7 @@
 import express from 'express';
 
-import { getInquestById, getInquests } from '../db/inquests';
-import { PAGINATION } from '../common/constants';
+import { getInquestById, getInquests } from '../dao/inquests';
+import { PAGINATION } from '../constants';
 
 const router = express.Router();
 

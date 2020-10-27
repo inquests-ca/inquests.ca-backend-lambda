@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { getInquestKeywords, getAuthorityKeywords } from '../db/keywords';
+import { getInquestKeywords, getAuthorityKeywords } from '../dao/keywords';
 
 const router = express.Router();
 

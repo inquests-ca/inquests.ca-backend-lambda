@@ -1,7 +1,7 @@
 import { getRepository } from 'typeorm';
 
-import { InquestCategory } from '../entity/InquestCategory';
-import { AuthorityCategory } from '../entity/AuthorityCategory';
+import { InquestCategory } from '../models/InquestCategory';
+import { AuthorityCategory } from '../models/AuthorityCategory';
 
 export const getInquestKeywords = async (): Promise<InquestCategory[]> =>
   getRepository(InquestCategory)

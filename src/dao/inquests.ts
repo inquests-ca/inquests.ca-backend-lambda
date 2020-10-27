@@ -1,7 +1,7 @@
 import { getRepository } from 'typeorm';
 
-import { Inquest } from '../entity/Inquest';
-import { escapeRegex } from '../common/utils';
+import { Inquest } from '../models/Inquest';
+import { escapeRegex } from '../utils/sql';
 
 export const getInquestById = async (inquestId: number): Promise<Inquest> =>
   getRepository(Inquest)

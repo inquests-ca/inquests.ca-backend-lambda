@@ -1,7 +1,7 @@
 import { getRepository } from 'typeorm';
 
-import { Authority } from '../entity/Authority';
-import { escapeRegex } from '../common/utils';
+import { Authority } from '../models/Authority';
+import { escapeRegex } from '../utils/sql';
 
 export const getAuthorityById = async (authorityId: number): Promise<Authority> =>
   // TODO: authority document type.

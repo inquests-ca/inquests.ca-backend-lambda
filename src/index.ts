@@ -3,7 +3,7 @@ import http from 'http';
 import dotenv from 'dotenv';
 import { createConnection } from 'typeorm';
 
-import app from './app/app';
+import app from './app';
 
 dotenv.config();
 const logger = debug('temp:server');
