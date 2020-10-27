@@ -1,11 +1,11 @@
 {
-  "name": "inquests-ca-backend-lambda",
+  "name": "inquests-ca-backend",
   "version": "0.0.1",
   "description": "Backend for inquests.ca, deployed on Heroku.",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/inquests-ca/inquests.ca-backend-lambda.git"
+    "url": "https://github.com/inquests-ca/inquests.ca-backend.git"
   },
   "dependencies": {
     "express": "^4.17.1",
