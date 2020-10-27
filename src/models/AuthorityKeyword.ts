@@ -4,21 +4,18 @@ import { AuthorityCategory } from './AuthorityCategory';
 @Entity('authorityKeyword')
 export class AuthorityKeyword extends BaseEntity {
   @PrimaryColumn('char', { length: 100 })
-  authorityKeywordId: string;
+  authorityKeywordId!: string;
 
   @Column('char', { length: 100 })
-  authorityCategoryId: string;
+  authorityCategoryId!: string;
 
   @Column('varchar', { unique: true, length: 255 })
-  name: string;
+  name!: string;
 
   @Column('varchar', { nullable: true, length: 255 })
-  description: string | null;
+  description!: string | null;
 
-  @ManyToOne(
-    () => AuthorityCategory,
-    authorityCategory => authorityCategory.authorityKeywords
-  )
+  @ManyToOne(() => AuthorityCategory, (authorityCategory) => authorityCategory.authorityKeywords)
   @JoinColumn({ name: 'authorityCategoryId', referencedColumnName: 'authorityCategoryId' })
-  authorityCategory: AuthorityCategory;
+  authorityCategory!: AuthorityCategory;
 }

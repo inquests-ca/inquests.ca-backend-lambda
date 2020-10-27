@@ -18,70 +18,61 @@ import { InquestKeyword } from './InquestKeyword';
 @Entity('inquest')
 export class Inquest extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
-  inquestId: number;
+  inquestId!: number;
 
   @Column('char', { length: 100 })
-  jurisdictionId: string;
+  jurisdictionId!: string;
 
   @Column('tinyint', { unsigned: true })
-  isPrimary: boolean;
+  isPrimary!: boolean;
 
   @Column('varchar', { length: 255 })
-  name: string;
+  name!: string;
 
   @Column('varchar', { nullable: true, length: 255 })
-  overview: string | null;
+  overview!: string | null;
 
   @Column('varchar', { length: 5000 })
-  synopsis: string;
+  synopsis!: string;
 
   @Column('varchar', { nullable: true, length: 1000 })
-  notes: string | null;
+  notes!: string | null;
 
   @Column('varchar', { length: 255 })
-  presidingOfficer: string;
+  presidingOfficer!: string;
 
   @Column('date')
-  start: string;
+  start!: string;
 
   @Column('date', { nullable: true })
-  end: string | null;
+  end!: string | null;
 
   @Column('int', { nullable: true })
-  sittingDays: number | null;
+  sittingDays!: number | null;
 
   @Column('int', { nullable: true })
-  exhibits: number | null;
+  exhibits!: number | null;
 
   @Column('varchar', { nullable: true, length: 1000 })
-  remarks: string | null;
+  remarks!: string | null;
 
-  @ManyToMany(
-    () => Authority,
-    authority => authority.inquests
-  )
-  authorities: Authority[];
+  @ManyToMany(() => Authority, (authority) => authority.inquests)
+  authorities!: Authority[];
 
-  @OneToMany(
-    () => Deceased,
-    deceased => deceased.inquest
-  )
-  deceased: Deceased[];
+  @OneToMany(() => Deceased, (deceased) => deceased.inquest)
+  deceased!: Deceased[];
 
   @ManyToOne(() => Jurisdiction)
   @JoinColumn({ name: 'jurisdictionId', referencedColumnName: 'jurisdictionId' })
-  jurisdiction: Jurisdiction;
+  jurisdiction!: Jurisdiction;
 
-  @OneToMany(
-    () => InquestDocument,
-    inquestDocument => inquestDocument.inquest
-  )
-  inquestDocuments: InquestDocument[];
+  @OneToMany(() => InquestDocument, (inquestDocument) => inquestDocument.inquest)
+  inquestDocuments!: InquestDocument[];
 
   @ManyToMany(() => InquestKeyword)
   @JoinTable({
     name: 'inquestKeywords',
     joinColumn: { name: 'inquestId', referencedColumnName: 'inquestId' },
   })
-  inquestKeywords: InquestKeyword[];
+  inquestKeywords!: InquestKeyword[];
 }

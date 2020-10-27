@@ -5,22 +5,22 @@ import { DocumentSource } from './DocumentSource';
 @Entity('authorityDocumentLinks')
 export class AuthorityDocumentLinks extends BaseEntity {
   @PrimaryColumn('int', { unsigned: true })
-  authorityDocumentId: number;
+  authorityDocumentId!: number;
 
   @PrimaryColumn('char', { length: 100 })
-  documentSourceId: string;
+  documentSourceId!: string;
 
   @Column('varchar', { length: 1000 })
-  link: string;
+  link!: string;
 
   @ManyToOne(
     () => AuthorityDocument,
-    authorityDocument => authorityDocument.authorityDocumentLinks
+    (authorityDocument) => authorityDocument.authorityDocumentLinks
   )
   @JoinColumn({ name: 'authorityDocumentId', referencedColumnName: 'authorityDocumentId' })
-  authorityDocument: AuthorityDocument;
+  authorityDocument!: AuthorityDocument;
 
   @ManyToOne(() => DocumentSource)
   @JoinColumn({ name: 'documentSourceId', referencedColumnName: 'documentSourceId' })
-  documentSource: DocumentSource;
+  documentSource!: DocumentSource;
 }

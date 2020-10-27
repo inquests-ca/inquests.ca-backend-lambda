@@ -4,21 +4,18 @@ import { InquestCategory } from './InquestCategory';
 @Entity('inquestKeyword')
 export class InquestKeyword extends BaseEntity {
   @PrimaryColumn('char', { length: 100 })
-  inquestKeywordId: string;
+  inquestKeywordId!: string;
 
   @Column('char', { length: 100 })
-  inquestCategoryId: string;
+  inquestCategoryId!: string;
 
   @Column('varchar', { unique: true, length: 255 })
-  name: string;
+  name!: string;
 
   @Column('varchar', { nullable: true, length: 255 })
-  description: string | null;
+  description!: string | null;
 
-  @ManyToOne(
-    () => InquestCategory,
-    inquestCategory => inquestCategory.inquestKeywords
-  )
+  @ManyToOne(() => InquestCategory, (inquestCategory) => inquestCategory.inquestKeywords)
   @JoinColumn({ name: 'inquestCategoryId', referencedColumnName: 'inquestCategoryId' })
-  inquestCategory: InquestCategory;
+  inquestCategory!: InquestCategory;
 }

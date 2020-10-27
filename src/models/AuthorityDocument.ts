@@ -15,47 +15,44 @@ import { AuthorityDocumentLinks } from './AuthorityDocumentLinks';
 @Entity('authorityDocument')
 export class AuthorityDocument extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
-  authorityDocumentId: number;
+  authorityDocumentId!: number;
 
   @Column('int', { unsigned: true })
-  authorityId: number;
+  authorityId!: number;
 
   @Column('char', { nullable: true, length: 100 })
-  authorityDocumentTypeId: string | null;
+  authorityDocumentTypeId!: string | null;
 
   @Column('char', { length: 100 })
-  sourceId: string;
+  sourceId!: string;
 
   @Column('tinyint', { unsigned: true })
-  isPrimary: boolean;
+  isPrimary!: boolean;
 
   @Column('varchar', { length: 255 })
-  name: string;
+  name!: string;
 
   @Column('varchar', { nullable: true, length: 255 })
-  citation: string | null;
+  citation!: string | null;
 
   @Column('date', { nullable: true })
-  created: string | null;
+  created!: string | null;
 
   @ManyToOne(() => AuthorityDocumentType)
   @JoinColumn({ name: 'authorityDocumentTypeId', referencedColumnName: 'authorityDocumentTypeId' })
-  authorityDocumentType: AuthorityDocumentType;
+  authorityDocumentType!: AuthorityDocumentType;
 
-  @ManyToOne(
-    () => Authority,
-    authority => authority.authorityDocuments
-  )
+  @ManyToOne(() => Authority, (authority) => authority.authorityDocuments)
   @JoinColumn({ name: 'authorityId', referencedColumnName: 'authorityId' })
-  authority: Authority;
+  authority!: Authority;
 
   @ManyToOne(() => Source)
   @JoinColumn({ name: 'sourceId', referencedColumnName: 'sourceId' })
-  source: Source;
+  source!: Source;
 
   @OneToMany(
     () => AuthorityDocumentLinks,
-    authorityDocumentLinks => authorityDocumentLinks.authorityDocument
+    (authorityDocumentLinks) => authorityDocumentLinks.authorityDocument
   )
-  authorityDocumentLinks: AuthorityDocumentLinks[];
+  authorityDocumentLinks!: AuthorityDocumentLinks[];
 }

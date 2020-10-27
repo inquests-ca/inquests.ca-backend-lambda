@@ -4,21 +4,21 @@ import { Jurisdiction } from './Jurisdiction';
 @Entity('source')
 export class Source extends BaseEntity {
   @PrimaryColumn('char', { length: 100 })
-  sourceId: string;
+  sourceId!: string;
 
   @Column('char', { nullable: true, length: 100 })
-  jurisdictionId: string | null;
+  jurisdictionId!: string | null;
 
   @Column('varchar', { length: 255 })
-  name: string;
+  name!: string;
 
   @Column('varchar', { nullable: true, length: 255 })
-  code: string | null;
+  code!: string | null;
 
   @Column('int', { unsigned: true })
-  rank: number;
+  rank!: number;
 
   @ManyToOne(() => Jurisdiction)
   @JoinColumn({ name: 'jurisdictionId', referencedColumnName: 'jurisdictionId' })
-  jurisdiction: Jurisdiction;
+  jurisdiction!: Jurisdiction;
 }

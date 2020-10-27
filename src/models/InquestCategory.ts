@@ -4,17 +4,14 @@ import { InquestKeyword } from './InquestKeyword';
 @Entity('inquestCategory')
 export class InquestCategory extends BaseEntity {
   @PrimaryColumn('char', { length: 100 })
-  inquestCategoryId: string;
+  inquestCategoryId!: string;
 
   @Column('varchar', { unique: true, length: 255 })
-  name: string;
+  name!: string;
 
   @Column('varchar', { nullable: true, length: 255 })
-  description: string | null;
+  description!: string | null;
 
-  @OneToMany(
-    () => InquestKeyword,
-    inquestKeyword => inquestKeyword.inquestCategory
-  )
-  inquestKeywords: InquestKeyword[];
+  @OneToMany(() => InquestKeyword, (inquestKeyword) => inquestKeyword.inquestCategory)
+  inquestKeywords!: InquestKeyword[];
 }

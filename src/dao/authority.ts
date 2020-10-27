@@ -5,7 +5,7 @@ import { escapeRegex } from '../utils/sql';
 
 @EntityRepository(Authority)
 export class AuthorityRepository extends AbstractRepository<Authority> {
-  getAuthorityById(authorityId: number): Promise<Authority> {
+  getAuthorityById(authorityId: number): Promise<Authority | undefined> {
     return this.createQueryBuilder('authority')
       .innerJoinAndSelect('authority.authorityDocuments', 'documents')
       .innerJoinAndSelect('documents.source', 'source')

@@ -6,47 +6,44 @@ import { InquestType } from './InquestType';
 @Entity('deceased')
 export class Deceased extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
-  deceasedId: number;
+  deceasedId!: number;
 
   @Column('int', { unsigned: true })
-  inquestId: number;
+  inquestId!: number;
 
   @Column('char', { length: 100 })
-  inquestTypeId: string;
+  inquestTypeId!: string;
 
   @Column('char', { length: 100 })
-  deathMannerId: string;
+  deathMannerId!: string;
 
   @Column('varchar', { length: 255 })
-  deathCause: string;
+  deathCause!: string;
 
   @Column('date')
-  deathDate: string;
+  deathDate!: string;
 
   @Column('varchar', { nullable: true, length: 255 })
-  lastName: string | null;
+  lastName!: string | null;
 
   @Column('varchar', { nullable: true, length: 255 })
-  givenNames: string | null;
+  givenNames!: string | null;
 
   @Column('int', { nullable: true })
-  age: number | null;
+  age!: number | null;
 
   @Column('varchar', { nullable: true, length: 255 })
-  sex: string | null;
+  sex!: string | null;
 
   @ManyToOne(() => DeathManner)
   @JoinColumn({ name: 'deathMannerId', referencedColumnName: 'deathMannerId' })
-  deathManner: DeathManner;
+  deathManner!: DeathManner;
 
-  @ManyToOne(
-    () => Inquest,
-    inquest => inquest.deceased
-  )
+  @ManyToOne(() => Inquest, (inquest) => inquest.deceased)
   @JoinColumn({ name: 'inquestId', referencedColumnName: 'inquestId' })
-  inquest: Inquest;
+  inquest!: Inquest;
 
   @ManyToOne(() => InquestType)
   @JoinColumn({ name: 'inquestTypeId', referencedColumnName: 'inquestTypeId' })
-  inquestType: InquestType;
+  inquestType!: InquestType;
 }

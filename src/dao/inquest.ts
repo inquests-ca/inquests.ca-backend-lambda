@@ -5,7 +5,7 @@ import { escapeRegex } from '../utils/sql';
 
 @EntityRepository(Inquest)
 export class InquestRepository extends AbstractRepository<Inquest> {
-  getInquestById(inquestId: number): Promise<Inquest> {
+  getInquestById(inquestId: number): Promise<Inquest | undefined> {
     return this.createQueryBuilder('inquest')
       .innerJoinAndSelect('inquest.jurisdiction', 'jurisdiction')
       .innerJoinAndSelect('inquest.deceased', 'deceased')
@@ -20,9 +20,9 @@ export class InquestRepository extends AbstractRepository<Inquest> {
   }
 
   async getInquests(
-    q: string,
-    keywords: Set<string>,
-    jurisdiction: string,
+    q: string | null,
+    keywords: Set<string> | null,
+    jurisdiction: string | null,
     limit: number,
     offset: number
   ): Promise<[Inquest[], number]> {
