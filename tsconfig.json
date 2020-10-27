@@ -1,18 +1,12 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "outDir": "./build",
-    "watch": false,
+    "outDir": "./dist/",
     "lib": ["es5", "es6"],
     "target": "es5",
     "module": "commonjs",
-    "moduleResolution": "node",
     "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "sourceMap": true
+    "experimentalDecorators": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules/**/*"],
-  "emitDecoratorMetadata": true,
-  "experimentalDecorators": true
+  "include": ["src"]
 }
