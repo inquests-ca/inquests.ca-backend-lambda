@@ -1,7 +1,7 @@
 import { getInquestById, getInquests } from '../db/inquests';
 import { getAuthorityById, getAuthorities } from '../db/authorities';
 import { getInquestKeywords, getAuthorityKeywords } from '../db/keywords';
-import * as express from 'express';
+import express from 'express';
 
 const app = express();
 
