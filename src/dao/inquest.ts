@@ -19,13 +19,19 @@ export class InquestRepository extends AbstractRepository<Inquest> {
       .getOne();
   }
 
-  async getInquests(
-    q: string | null,
-    keywords: Set<string> | null,
-    jurisdiction: string | null,
-    limit: number,
-    offset: number
-  ): Promise<[Inquest[], number]> {
+  async getInquests({
+    offset,
+    limit,
+    text,
+    keywords,
+    jurisdiction,
+  }: {
+    offset: number;
+    limit: number;
+    text?: string;
+    keywords?: string[];
+    jurisdiction?: string;
+  }): Promise<[Inquest[], number]> {
     // TODO: create userJurisdiction query parameter, use for ordering results.
     const qb = this.createQueryBuilder('inquest');
     const query = qb
@@ -40,8 +46,8 @@ export class InquestRepository extends AbstractRepository<Inquest> {
       .orderBy('inquest.isPrimary', 'DESC')
       .addOrderBy('isCanadian', 'DESC')
       .addOrderBy('inquest.start', 'DESC');
-    if (q !== null)
-      q.split(/\s+/).forEach((term, i) => {
+    if (text)
+      text.split(/\s+/).forEach((term, i) => {
         if (term)
           query.andWhere(
             `CONCAT(inquest.name, ' ', deceased.lastName, ' ', deceased.givenNames) REGEXP :regexp${i}`,
@@ -51,9 +57,9 @@ export class InquestRepository extends AbstractRepository<Inquest> {
             }
           );
       });
-    if (jurisdiction !== null)
+    if (jurisdiction)
       query.andWhere('jurisdiction.jurisdictionId = :jurisdiction', { jurisdiction });
-    if (keywords !== null) {
+    if (keywords && keywords.length) {
       // Use sub-query to get list of inquests by ID which match all provided keywords.
       const subQuery = qb
         .subQuery()
@@ -65,7 +71,7 @@ export class InquestRepository extends AbstractRepository<Inquest> {
         .getQuery();
       query
         .andWhere(`inquest.inquestId IN ${subQuery}`)
-        .setParameters({ keywords: Array.from(keywords), totalKeywords: keywords.size });
+        .setParameters({ keywords: Array.from(keywords), totalKeywords: keywords.length });
     }
 
     return query.getManyAndCount();

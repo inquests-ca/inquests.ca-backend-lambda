@@ -21,13 +21,19 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
       .getOne();
   }
 
-  async getAuthorities(
-    q: string | null,
-    keywords: Set<string> | null,
-    jurisdiction: string | null,
-    limit: number,
-    offset: number
-  ): Promise<[Authority[], number]> {
+  async getAuthorities({
+    offset,
+    limit,
+    text,
+    keywords,
+    jurisdiction,
+  }: {
+    offset: number;
+    limit: number;
+    text?: string;
+    keywords?: string[];
+    jurisdiction?: string;
+  }): Promise<[Authority[], number]> {
     // TODO: create userJurisdiction query parameter, use for ordering results.
     const qb = this.createQueryBuilder('authority');
     const query = qb
@@ -48,8 +54,8 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
       .addOrderBy('isCanadian', 'DESC')
       .addOrderBy('source.rank', 'DESC')
       .addOrderBy('primaryDocument.created', 'DESC');
-    if (q !== null)
-      q.split(/\s+/).forEach((term, i) => {
+    if (text)
+      text.split(/\s+/).forEach((term, i) => {
         if (term)
           query.andWhere(
             `CONCAT(authority.name, ' ', primaryDocument.citation) REGEXP :regexp${i}`,
@@ -59,9 +65,8 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
             }
           );
       });
-    if (jurisdiction !== null)
-      query.andWhere('source.jurisdiction = :jurisdiction', { jurisdiction });
-    if (keywords !== null) {
+    if (jurisdiction) query.andWhere('source.jurisdiction = :jurisdiction', { jurisdiction });
+    if (keywords && keywords.length) {
       // Use sub-query to get list of authorities by ID which match all provided keywords.
       const subQuery = qb
         .subQuery()
@@ -73,7 +78,7 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
         .getQuery();
       query
         .andWhere(`authority.authorityId IN ${subQuery}`)
-        .setParameters({ keywords: Array.from(keywords), totalKeywords: keywords.size });
+        .setParameters({ keywords: keywords, totalKeywords: keywords.length });
     }
 
     return query.getManyAndCount();
