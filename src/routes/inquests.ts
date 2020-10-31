@@ -33,7 +33,7 @@ router.get('/:inquestId(\\d+)', async (req, res) => {
 
 const inquestQueryValidation = joi.object({
   text: joi.string(),
-  keywords: joi.string(),
+  keywords: joi.array(),
   jurisdiction: joi.string(),
   offset: joi.number().integer().min(0).default(0),
   limit: joi.number().integer().positive().default(PAGINATION),
@@ -50,7 +50,7 @@ router.get('/', async (req, res) => {
     offset,
     limit,
     text,
-    keywords: keywords?.split('__'),
+    keywords,
     jurisdiction,
   });
   res.json({ data, count });
