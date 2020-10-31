@@ -10,7 +10,7 @@ const router = express.Router();
  * Get all authority keywords, grouped by category.
  */
 
-router.get('/authorityKeywords', async (_req, res) => {
+router.get('/authority', async (_req, res) => {
   const authorityKeywords = await getCustomRepository(
     AuthorityCategoryRepository
   ).getAuthorityKeywords();
@@ -21,7 +21,7 @@ router.get('/authorityKeywords', async (_req, res) => {
  * Get all inquest keywords, grouped by category.
  */
 
-router.get('/inquestKeywords', async (_req, res) => {
+router.get('/inquest', async (_req, res) => {
   const inquestKeywords = await getCustomRepository(InquestCategoryRepository).getInquestKeywords();
   res.json(inquestKeywords);
 });

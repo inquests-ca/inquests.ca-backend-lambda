@@ -20,7 +20,7 @@ app.use((req, res, next) => {
 
 app.use('/authorities', authoritiesRouter);
 app.use('/inquests', inquestsRouter);
-app.use('/', keywordsRouter);
+app.use('/keywords', keywordsRouter);
 
 // Catch 404 and forward to error handler.
 app.use((_req, _res, next) => {
