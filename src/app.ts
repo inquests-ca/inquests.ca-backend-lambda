@@ -31,13 +31,13 @@ app.use((_req, _res, next) => {
 // TODO: catch Promise rejections.
 app.use(
   (
-    err: { status: number },
+    err: { status: number; message: string },
     _req: express.Request,
     res: express.Response,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _next: express.NextFunction
   ) => {
-    // TODO: log error.
+    console.error(err.message);
     res.sendStatus(err.status || 500);
   }
 );
