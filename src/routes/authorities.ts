@@ -1,5 +1,6 @@
 import express from 'express';
 import joi from 'joi';
+import createError from 'http-errors';
 import { getCustomRepository } from 'typeorm';
 
 import { AuthorityRepository } from '../dao/authority';
@@ -12,16 +13,16 @@ const router = express.Router();
  */
 
 const authorityIdValidation = joi.number().integer().positive().required();
-router.get('/:authorityId(\\d+)', async (req, res) => {
+router.get('/:authorityId(\\d+)', async (req, res, next) => {
   const query = authorityIdValidation.validate(req.params.authorityId);
   if (query.error) {
-    res.sendStatus(400);
+    next(createError(400));
     return;
   }
 
   const authority = await getCustomRepository(AuthorityRepository).getAuthorityById(query.value);
   if (!authority) {
-    res.status(404).send('Authority not found');
+    next(createError(404, 'Authority not found'));
     return;
   }
   res.json(authority);
@@ -44,10 +45,10 @@ const authorityQueryValidation = joi.object<{
   keywords: joi.array(),
   jurisdiction: joi.string(),
 });
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
   const query = authorityQueryValidation.validate(req.query);
   if (query.error) {
-    res.sendStatus(400);
+    next(createError(400));
     return;
   }
 

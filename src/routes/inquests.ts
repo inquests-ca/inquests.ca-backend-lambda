@@ -1,5 +1,6 @@
 import express from 'express';
 import joi from 'joi';
+import createError from 'http-errors';
 import { getCustomRepository } from 'typeorm';
 
 import { InquestRepository } from '../dao/inquest';
@@ -12,16 +13,16 @@ const router = express.Router();
  */
 
 const inquestIdValidation = joi.number().integer().positive().required();
-router.get('/:inquestId(\\d+)', async (req, res) => {
+router.get('/:inquestId(\\d+)', async (req, res, next) => {
   const query = inquestIdValidation.validate(req.params.inquestId);
   if (query.error) {
-    res.sendStatus(400);
+    next(createError(400));
     return;
   }
 
   const inquest = await getCustomRepository(InquestRepository).getInquestById(query.value);
   if (!inquest) {
-    res.status(404).send('Inquest not found');
+    next(createError(404, 'Inquest not found'));
     return;
   }
   res.json(inquest);
@@ -44,10 +45,10 @@ const inquestQueryValidation = joi.object<{
   keywords: joi.array(),
   jurisdiction: joi.string(),
 });
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
   const query = inquestQueryValidation.validate(req.query);
   if (query.error) {
-    res.sendStatus(400);
+    next(createError(400));
     return;
   }
 
