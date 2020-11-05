@@ -31,12 +31,18 @@ router.get('/:authorityId(\\d+)', async (req, res) => {
  * Get authorities with optional search parameters and pagination.
  */
 
-const authorityQueryValidation = joi.object({
+const authorityQueryValidation = joi.object<{
+  offset: number;
+  limit: number;
+  text?: string;
+  keywords?: string[];
+  jurisdiction?: string;
+}>({
+  offset: joi.number().integer().min(0).default(0),
+  limit: joi.number().integer().positive().default(PAGINATION),
   text: joi.string(),
   keywords: joi.array(),
   jurisdiction: joi.string(),
-  offset: joi.number().integer().min(0).default(0),
-  limit: joi.number().integer().positive().default(PAGINATION),
 });
 router.get('/', async (req, res) => {
   const query = authorityQueryValidation.validate(req.query);
