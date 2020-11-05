@@ -21,7 +21,7 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
       .getOne();
   }
 
-  async getAuthorities({
+  getAuthorities({
     offset,
     limit,
     text,

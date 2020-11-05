@@ -19,7 +19,7 @@ export class InquestRepository extends AbstractRepository<Inquest> {
       .getOne();
   }
 
-  async getInquests({
+  getInquests({
     offset,
     limit,
     text,
