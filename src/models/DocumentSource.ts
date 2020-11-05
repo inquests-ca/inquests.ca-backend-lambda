@@ -3,11 +3,11 @@ import { Column, Entity, BaseEntity, PrimaryColumn } from 'typeorm';
 @Entity('documentSource')
 export class DocumentSource extends BaseEntity {
   @PrimaryColumn('char', { length: 100 })
-  documentSourceId: string;
+  documentSourceId!: string;
 
   @Column('varchar', { length: 255 })
-  name: string;
+  name!: string;
 
   @Column('tinyint', { unsigned: true })
-  isFree: boolean;
+  isFree!: boolean;
 }

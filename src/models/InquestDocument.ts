@@ -14,35 +14,32 @@ import { InquestDocumentLinks } from './InquestDocumentLinks';
 @Entity('inquestDocument')
 export class InquestDocument extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
-  inquestDocumentId: number;
+  inquestDocumentId!: number;
 
   @Column('int', { unsigned: true })
-  inquestId: number;
+  inquestId!: number;
 
   @Column('char', { nullable: true, length: 100 })
-  inquestDocumentTypeId: string | null;
+  inquestDocumentTypeId!: string | null;
 
   @Column('varchar', { length: 255 })
-  name: string;
+  name!: string;
 
   @Column('date')
-  created: string;
+  created!: string;
 
   @ManyToOne(() => InquestDocumentType)
   @JoinColumn({ name: 'inquestDocumentTypeId', referencedColumnName: 'inquestDocumentTypeId' })
-  inquestDocumentType: InquestDocumentType;
+  inquestDocumentType!: InquestDocumentType;
 
   @OneToMany(
     () => InquestDocumentLinks,
-    inquestDocumentLink => inquestDocumentLink.inquestDocument
+    (inquestDocumentLink) => inquestDocumentLink.inquestDocument
   )
   @JoinColumn({ name: 'inquestDocumentTypeId', referencedColumnName: 'inquestDocumentTypeId' })
-  inquestDocumentLinks: InquestDocumentLinks[];
+  inquestDocumentLinks!: InquestDocumentLinks[];
 
-  @ManyToOne(
-    () => Inquest,
-    inquest => inquest.inquestDocuments
-  )
+  @ManyToOne(() => Inquest, (inquest) => inquest.inquestDocuments)
   @JoinColumn({ name: 'inquestId', referencedColumnName: 'inquestId' })
-  inquest: Inquest;
+  inquest!: Inquest;
 }

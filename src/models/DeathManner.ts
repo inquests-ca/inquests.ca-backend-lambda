@@ -1,10 +1,10 @@
 import { Column, Entity, BaseEntity, PrimaryColumn } from 'typeorm';
 
-@Entity('jurisdictionCategory')
-export class JurisdictionCategory extends BaseEntity {
+@Entity('deathManner')
+export class DeathManner extends BaseEntity {
   @PrimaryColumn('char', { length: 100 })
-  jurisdictionCategoryId: string;
+  deathMannerId!: string;
 
   @Column('varchar', { length: 255 })
-  name: string;
+  name!: string;
 }

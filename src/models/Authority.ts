@@ -14,45 +14,39 @@ import { AuthorityKeyword } from './AuthorityKeyword';
 @Entity('authority')
 export class Authority extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
-  authorityId: number;
+  authorityId!: number;
 
   @Column('tinyint', { unsigned: true })
-  isPrimary: boolean;
+  isPrimary!: boolean;
 
   @Column('varchar', { length: 255 })
-  name: string;
+  name!: string;
 
   @Column('varchar', { length: 255 })
-  overview: string;
+  overview!: string;
 
   @Column('varchar', { length: 5000 })
-  synopsis: string;
+  synopsis!: string;
 
   @Column('varchar', { nullable: true, length: 5000 })
-  quotes: string | null;
+  quotes!: string | null;
 
   @Column('varchar', { nullable: true, length: 1000 })
-  notes: string | null;
+  notes!: string | null;
 
   @Column('varchar', { nullable: true, length: 1000 })
-  remarks: string | null;
+  remarks!: string | null;
 
-  @OneToMany(
-    () => AuthorityDocument,
-    authorityDocument => authorityDocument.authority
-  )
-  authorityDocuments: AuthorityDocument[];
+  @OneToMany(() => AuthorityDocument, (authorityDocument) => authorityDocument.authority)
+  authorityDocuments!: AuthorityDocument[];
 
-  @ManyToMany(
-    () => Inquest,
-    inquest => inquest.authorities
-  )
+  @ManyToMany(() => Inquest, (inquest) => inquest.authorities)
   @JoinTable({
     name: 'authorityInquests',
     joinColumn: { name: 'authorityId', referencedColumnName: 'authorityId' },
     inverseJoinColumn: { name: 'inquestId', referencedColumnName: 'inquestId' },
   })
-  inquests: Inquest[];
+  inquests!: Inquest[];
 
   @ManyToMany(() => AuthorityKeyword)
   @JoinTable({
@@ -60,71 +54,53 @@ export class Authority extends BaseEntity {
     joinColumn: { name: 'authorityId', referencedColumnName: 'authorityId' },
     inverseJoinColumn: { name: 'authorityKeywordId', referencedColumnName: 'authorityKeywordId' },
   })
-  authorityKeywords: AuthorityKeyword[];
+  authorityKeywords!: AuthorityKeyword[];
 
-  @ManyToMany(
-    () => Authority,
-    authority => authority.authorityCitedBy
-  )
+  @ManyToMany(() => Authority, (authority) => authority.authorityCitedBy)
   @JoinTable({
     name: 'authorityCitations',
     joinColumn: { name: 'authorityId', referencedColumnName: 'authorityId' },
     inverseJoinColumn: { name: 'citedAuthorityId', referencedColumnName: 'authorityId' },
   })
-  authorityCitations: Authority[];
+  authorityCitations!: Authority[];
 
-  @ManyToMany(
-    () => Authority,
-    authority => authority.authorityCitations
-  )
+  @ManyToMany(() => Authority, (authority) => authority.authorityCitations)
   @JoinTable({
     name: 'authorityCitations',
     joinColumn: { name: 'citedAuthorityId', referencedColumnName: 'authorityId' },
     inverseJoinColumn: { name: 'authorityId', referencedColumnName: 'authorityId' },
   })
-  authorityCitedBy: Authority[];
+  authorityCitedBy!: Authority[];
 
-  @ManyToMany(
-    () => Authority,
-    authority => authority.authorityRelatedBy
-  )
+  @ManyToMany(() => Authority, (authority) => authority.authorityRelatedBy)
   @JoinTable({
     name: 'authorityRelated',
     joinColumn: { name: 'authorityId', referencedColumnName: 'authorityId' },
     inverseJoinColumn: { name: 'relatedAuthorityId', referencedColumnName: 'authorityId' },
   })
-  authorityRelated: Authority[];
+  authorityRelated!: Authority[];
 
-  @ManyToMany(
-    () => Authority,
-    authority => authority.authorityRelated
-  )
+  @ManyToMany(() => Authority, (authority) => authority.authorityRelated)
   @JoinTable({
     name: 'authorityRelated',
     joinColumn: { name: 'relatedAuthorityId', referencedColumnName: 'authorityId' },
     inverseJoinColumn: { name: 'authorityId', referencedColumnName: 'authorityId' },
   })
-  authorityRelatedBy: Authority[];
+  authorityRelatedBy!: Authority[];
 
-  @ManyToMany(
-    () => Authority,
-    authority => authority.authoritySupercededBy
-  )
+  @ManyToMany(() => Authority, (authority) => authority.authoritySupercededBy)
   @JoinTable({
     name: 'authoritySuperceded',
     joinColumn: { name: 'authorityId', referencedColumnName: 'authorityId' },
     inverseJoinColumn: { name: 'supercededAuthorityId', referencedColumnName: 'authorityId' },
   })
-  authoritySuperceded: Authority[];
+  authoritySuperceded!: Authority[];
 
-  @ManyToMany(
-    () => Authority,
-    authority => authority.authoritySuperceded
-  )
+  @ManyToMany(() => Authority, (authority) => authority.authoritySuperceded)
   @JoinTable({
     name: 'authoritySuperceded',
     joinColumn: { name: 'supercededAuthorityId', referencedColumnName: 'authorityId' },
     inverseJoinColumn: { name: 'authorityId', referencedColumnName: 'authorityId' },
   })
-  authoritySupercededBy: Authority[];
+  authoritySupercededBy!: Authority[];
 }

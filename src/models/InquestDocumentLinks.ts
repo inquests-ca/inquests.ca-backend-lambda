@@ -5,22 +5,19 @@ import { InquestDocument } from './InquestDocument';
 @Entity('inquestDocumentLinks')
 export class InquestDocumentLinks extends BaseEntity {
   @PrimaryColumn('int', { unsigned: true })
-  inquestDocumentId: number;
+  inquestDocumentId!: number;
 
   @PrimaryColumn('char', { length: 100 })
-  documentSourceId: string;
+  documentSourceId!: string;
 
   @Column('varchar', { name: 'link', length: 1000 })
-  link: string;
+  link!: string;
 
   @ManyToOne(() => DocumentSource)
   @JoinColumn({ name: 'documentSourceId', referencedColumnName: 'documentSourceId' })
-  documentSource: DocumentSource;
+  documentSource!: DocumentSource;
 
-  @ManyToOne(
-    () => InquestDocument,
-    inquestDocument => inquestDocument.inquestDocumentLinks
-  )
+  @ManyToOne(() => InquestDocument, (inquestDocument) => inquestDocument.inquestDocumentLinks)
   @JoinColumn({ name: 'inquestDocumentId', referencedColumnName: 'inquestDocumentId' })
-  inquestDocument: InquestDocument;
+  inquestDocument!: InquestDocument;
 }

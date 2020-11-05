@@ -3,11 +3,11 @@ import { Column, Entity, BaseEntity, PrimaryColumn } from 'typeorm';
 @Entity('inquestDocumentType')
 export class InquestDocumentType extends BaseEntity {
   @PrimaryColumn('char', { length: 100 })
-  inquestDocumentTypeId: string;
+  inquestDocumentTypeId!: string;
 
   @Column('varchar', { name: 'name', length: 255 })
-  name: string;
+  name!: string;
 
   @Column('varchar', { nullable: true, length: 255 })
-  description: string | null;
+  description!: string | null;
 }

@@ -3,11 +3,11 @@ import { Column, Entity, BaseEntity, PrimaryColumn } from 'typeorm';
 @Entity('inquestType')
 export class InquestType extends BaseEntity {
   @PrimaryColumn('char', { length: 100 })
-  inquestTypeId: string;
+  inquestTypeId!: string;
 
   @Column('varchar', { length: 255 })
-  name: string;
+  name!: string;
 
   @Column('tinyint', { unsigned: true })
-  isMandatory: boolean;
+  isMandatory!: boolean;
 }
