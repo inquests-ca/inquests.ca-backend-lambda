@@ -80,13 +80,13 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
         .subQuery()
         .select('keywords.authorityId')
         .from('authorityKeywords', 'keywords')
-        .where('keywords.authorityKeywordId IN (:keywords)')
+        .where('keywords.authorityKeywordId IN (:keywords)', { keywords })
         .groupBy('keywords.authorityId')
-        .having('COUNT(keywords.authorityId) >= (:totalKeywords)')
+        .having('COUNT(keywords.authorityId) >= (:totalKeywords)', {
+          totalKeywords: keywords.length,
+        })
         .getQuery();
-      query
-        .andWhere(`authority.authorityId IN ${subQuery}`)
-        .setParameters({ keywords: keywords, totalKeywords: keywords.length });
+      query.andWhere(`authority.authorityId IN ${subQuery}`);
     }
 
     return query.getManyAndCount();

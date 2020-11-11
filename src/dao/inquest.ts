@@ -74,13 +74,11 @@ export class InquestRepository extends AbstractRepository<Inquest> {
         .subQuery()
         .select('keywords.inquestId')
         .from('inquestKeywords', 'keywords')
-        .where('keywords.inquestKeywordId IN (:keywords)')
+        .where('keywords.inquestKeywordId IN (:keywords)', { keywords })
         .groupBy('keywords.inquestId')
-        .having('COUNT(keywords.inquestId) >= (:totalKeywords)')
+        .having('COUNT(keywords.inquestId) >= (:totalKeywords)', { totalKeywords: keywords.length })
         .getQuery();
-      query
-        .andWhere(`inquest.inquestId IN ${subQuery}`)
-        .setParameters({ keywords: Array.from(keywords), totalKeywords: keywords.length });
+      query.andWhere(`inquest.inquestId IN ${subQuery}`);
     }
 
     return query.getManyAndCount();
