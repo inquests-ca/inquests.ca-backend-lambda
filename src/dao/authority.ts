@@ -1,7 +1,7 @@
-import { EntityRepository, AbstractRepository } from 'typeorm';
+import { EntityRepository, AbstractRepository, Brackets } from 'typeorm';
 
 import { Authority } from '../models/Authority';
-import { escapeRegex } from '../utils/sql';
+import { escapeRegex, getConcatExpression } from '../utils/sql';
 
 @EntityRepository(Authority)
 export class AuthorityRepository extends AbstractRepository<Authority> {
@@ -45,6 +45,7 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
       .innerJoinAndSelect('primaryDocument.source', 'source')
       .leftJoin('source.jurisdiction', 'jurisdiction')
       .innerJoin('jurisdiction.jurisdictionCategory', 'jurisdictionCategory')
+      .leftJoin('authority.authorityTags', 'authorityTags')
       .addSelect("(source.sourceId = 'CAD_SCC')", 'supremeCourt') // Used for ordering
       .addSelect("(jurisdictionCategory.jurisdictionCategoryId = 'CAD')", 'isCanadian') // Used for ordering
       .take(limit)
@@ -56,14 +57,21 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
       .addOrderBy('primaryDocument.created', 'DESC');
     if (text)
       text.split(/\s+/).forEach((term, i) => {
-        if (term)
+        if (term) {
+          // Match start of string or non-word character followed by search term.
+          const regex = `(^|[^A-Za-z0-9])${escapeRegex(term)}`;
           query.andWhere(
-            `CONCAT(authority.name, ' ', primaryDocument.citation) REGEXP :regexp${i}`,
-            {
-              // Match start of string or non-word character followed by search term.
-              [`regexp${i}`]: `(^|[^A-Za-z0-9])${escapeRegex(term)}`,
-            }
+            new Brackets((qb) => {
+              qb.where(
+                `${getConcatExpression([
+                  'authority.name',
+                  'primaryDocument.citation',
+                ])} REGEXP :regexp${i}`
+              ).orWhere(`authorityTags.tag REGEXP :regexp${i}`);
+            }),
+            { [`regexp${i}`]: regex }
           );
+        }
       });
     if (jurisdiction) query.andWhere('source.jurisdiction = :jurisdiction', { jurisdiction });
     if (keywords && keywords.length) {

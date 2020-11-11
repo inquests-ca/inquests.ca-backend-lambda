@@ -1,7 +1,7 @@
-import { EntityRepository, AbstractRepository } from 'typeorm';
+import { EntityRepository, AbstractRepository, Brackets } from 'typeorm';
 
 import { Inquest } from '../models/Inquest';
-import { escapeRegex } from '../utils/sql';
+import { escapeRegex, getConcatExpression } from '../utils/sql';
 
 @EntityRepository(Inquest)
 export class InquestRepository extends AbstractRepository<Inquest> {
@@ -40,6 +40,7 @@ export class InquestRepository extends AbstractRepository<Inquest> {
       .innerJoinAndSelect('deceased.deathManner', 'deathManner')
       .innerJoinAndSelect('deceased.inquestType', 'inquestType')
       .innerJoin('jurisdiction.jurisdictionCategory', 'jurisdictionCategory')
+      .leftJoin('inquest.inquestTags', 'inquestTags')
       .addSelect("(jurisdictionCategory.jurisdictionCategoryId = 'CAD')", 'isCanadian') // Used for ordering
       .take(limit)
       .skip(offset)
@@ -48,14 +49,22 @@ export class InquestRepository extends AbstractRepository<Inquest> {
       .addOrderBy('inquest.start', 'DESC');
     if (text)
       text.split(/\s+/).forEach((term, i) => {
-        if (term)
+        if (term) {
+          // Match start of string or non-word character followed by search term.
+          const regex = `(^|[^A-Za-z0-9])${escapeRegex(term)}`;
           query.andWhere(
-            `CONCAT(inquest.name, ' ', deceased.lastName, ' ', deceased.givenNames) REGEXP :regexp${i}`,
-            {
-              // Match start of string or non-word character followed by search term.
-              [`regexp${i}`]: `(^|[^A-Za-z0-9])${escapeRegex(term)}`,
-            }
+            new Brackets((qb) => {
+              qb.where(
+                `${getConcatExpression([
+                  'inquest.name',
+                  'deceased.lastName',
+                  'deceased.givenNames',
+                ])} REGEXP :regexp${i}`
+              ).orWhere(`inquestTags.tag REGEXP :regexp${i}`);
+            }),
+            { [`regexp${i}`]: regex }
           );
+        }
       });
     if (jurisdiction)
       query.andWhere('jurisdiction.jurisdictionId = :jurisdiction', { jurisdiction });
