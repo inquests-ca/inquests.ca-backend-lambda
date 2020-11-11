@@ -14,6 +14,7 @@ import { Deceased } from './Deceased';
 import { Jurisdiction } from './Jurisdiction';
 import { InquestDocument } from './InquestDocument';
 import { InquestKeyword } from './InquestKeyword';
+import { InquestTags } from './InquestTags';
 
 @Entity('inquest')
 export class Inquest extends BaseEntity {
@@ -75,4 +76,7 @@ export class Inquest extends BaseEntity {
     joinColumn: { name: 'inquestId', referencedColumnName: 'inquestId' },
   })
   inquestKeywords!: InquestKeyword[];
+
+  @OneToMany(() => InquestTags, (inquestTag) => inquestTag.inquest)
+  inquestTags!: InquestTags[];
 }
