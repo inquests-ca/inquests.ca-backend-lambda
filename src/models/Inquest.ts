@@ -74,6 +74,7 @@ export class Inquest extends BaseEntity {
   @JoinTable({
     name: 'inquestKeywords',
     joinColumn: { name: 'inquestId', referencedColumnName: 'inquestId' },
+    inverseJoinColumn: { name: 'inquestKeywordId', referencedColumnName: 'inquestKeywordId' },
   })
   inquestKeywords!: InquestKeyword[];
 

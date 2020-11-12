@@ -45,7 +45,8 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
       .innerJoinAndSelect('primaryDocument.source', 'source')
       .leftJoin('source.jurisdiction', 'jurisdiction')
       .innerJoin('jurisdiction.jurisdictionCategory', 'jurisdictionCategory')
-      .leftJoin('authority.authorityTags', 'authorityTags')
+      .leftJoin('authority.authorityKeywords', 'keywords')
+      .leftJoin('authority.authorityTags', 'tags')
       .addSelect("(source.sourceId = 'CAD_SCC')", 'supremeCourt') // Used for ordering
       .addSelect("(jurisdictionCategory.jurisdictionCategoryId = 'CAD')", 'isCanadian') // Used for ordering
       .take(limit)
@@ -67,7 +68,9 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
                   'authority.name',
                   'primaryDocument.citation',
                 ])} REGEXP :regexp${i}`
-              ).orWhere(`authorityTags.tag REGEXP :regexp${i}`);
+              )
+                .orWhere(`tags.tag REGEXP :regexp${i}`)
+                .orWhere(`keywords.name REGEXP :regexp${i}`);
             }),
             { [`regexp${i}`]: regex }
           );

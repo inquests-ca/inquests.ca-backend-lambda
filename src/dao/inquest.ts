@@ -40,7 +40,8 @@ export class InquestRepository extends AbstractRepository<Inquest> {
       .innerJoinAndSelect('deceased.deathManner', 'deathManner')
       .innerJoinAndSelect('deceased.inquestType', 'inquestType')
       .innerJoin('jurisdiction.jurisdictionCategory', 'jurisdictionCategory')
-      .leftJoin('inquest.inquestTags', 'inquestTags')
+      .leftJoin('inquest.inquestKeywords', 'keywords')
+      .leftJoin('inquest.inquestTags', 'tags')
       .addSelect("(jurisdictionCategory.jurisdictionCategoryId = 'CAD')", 'isCanadian') // Used for ordering
       .take(limit)
       .skip(offset)
@@ -60,7 +61,9 @@ export class InquestRepository extends AbstractRepository<Inquest> {
                   'deceased.lastName',
                   'deceased.givenNames',
                 ])} REGEXP :regexp${i}`
-              ).orWhere(`inquestTags.tag REGEXP :regexp${i}`);
+              )
+                .orWhere(`tags.tag REGEXP :regexp${i}`)
+                .orWhere(`keywords.name REGEXP :regexp${i}`);
             }),
             { [`regexp${i}`]: regex }
           );
