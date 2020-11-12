@@ -69,8 +69,8 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
                   'primaryDocument.citation',
                 ])} REGEXP :regexp${i}`
               )
-                .orWhere(`tags.tag REGEXP :regexp${i}`)
-                .orWhere(`keywords.name REGEXP :regexp${i}`);
+                .orWhere(`keywords.name REGEXP :regexp${i}`)
+                .orWhere(`tags.tag REGEXP :regexp${i}`);
             }),
             { [`regexp${i}`]: regex }
           );

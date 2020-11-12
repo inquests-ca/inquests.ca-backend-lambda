@@ -62,8 +62,8 @@ export class InquestRepository extends AbstractRepository<Inquest> {
                   'deceased.givenNames',
                 ])} REGEXP :regexp${i}`
               )
-                .orWhere(`tags.tag REGEXP :regexp${i}`)
-                .orWhere(`keywords.name REGEXP :regexp${i}`);
+                .orWhere(`keywords.name REGEXP :regexp${i}`)
+                .orWhere(`tags.tag REGEXP :regexp${i}`);
             }),
             { [`regexp${i}`]: regex }
           );
