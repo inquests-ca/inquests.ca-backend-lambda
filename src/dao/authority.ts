@@ -1,4 +1,4 @@
-import { EntityRepository, AbstractRepository, Brackets } from 'typeorm';
+import { EntityRepository, AbstractRepository } from 'typeorm';
 
 import { Authority } from '../models/Authority';
 import { escapeRegex, getConcatExpression } from '../utils/sql';
@@ -45,37 +45,54 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
       .innerJoinAndSelect('primaryDocument.source', 'source')
       .leftJoin('source.jurisdiction', 'jurisdiction')
       .innerJoin('jurisdiction.jurisdictionCategory', 'jurisdictionCategory')
-      .leftJoin('authority.authorityKeywords', 'keywords')
-      .leftJoin('authority.authorityTags', 'tags')
       .addSelect("(source.sourceId = 'CAD_SCC')", 'supremeCourt') // Used for ordering
       .addSelect("(jurisdictionCategory.jurisdictionCategoryId = 'CAD')", 'isCanadian') // Used for ordering
       .take(limit)
       .skip(offset)
-      .orderBy('authority.isPrimary', 'DESC')
+      .addOrderBy('authority.isPrimary', 'DESC')
       .addOrderBy('supremeCourt', 'DESC')
       .addOrderBy('isCanadian', 'DESC')
       .addOrderBy('source.rank', 'DESC')
       .addOrderBy('primaryDocument.created', 'DESC');
-    if (text)
-      text.split(/\s+/).forEach((term, i) => {
-        if (term) {
-          // Match start of string or non-word character followed by search term.
+    if (text) {
+      const terms = text.split(/\s+/).filter((term) => term);
+      if (terms.length) {
+        const searchTextQuery = qb
+          .subQuery()
+          .addSelect('authority.authorityId')
+          .addSelect('authority.name')
+          .addSelect('primaryDocument.citation')
+          .from('authority', 'authority')
+          .innerJoin(
+            'authority.authorityDocuments',
+            'primaryDocument',
+            'primaryDocument.isPrimary = 1'
+          )
+          .leftJoin('authority.authorityKeywords', 'keywords')
+          .leftJoin('authority.authorityTags', 'tags')
+          .addGroupBy('authority.authorityId')
+          .addGroupBy('primaryDocument.authorityDocumentId');
+        terms.forEach((term, i) => {
+          // For each search term, ensure at least 1 of several columns contains that term.
+          // Match the start of the string or a non-word character followed by each search term.
           const regex = `(^|[^A-Za-z0-9])${escapeRegex(term)}`;
-          query.andWhere(
-            new Brackets((qb) => {
-              qb.where(
-                `${getConcatExpression([
-                  'authority.name',
-                  'primaryDocument.citation',
-                ])} REGEXP :regexp${i}`
-              )
-                .orWhere(`keywords.name REGEXP :regexp${i}`)
-                .orWhere(`tags.tag REGEXP :regexp${i}`);
-            }),
+          searchTextQuery.andHaving(
+            `${getConcatExpression([
+              'authority.name',
+              'primaryDocument.citation',
+              "GROUP_CONCAT(keywords.name SEPARATOR ' ')",
+              "GROUP_CONCAT(tags.tag SEPARATOR ' ')",
+            ])} REGEXP :regexp${i}`,
             { [`regexp${i}`]: regex }
           );
-        }
-      });
+        });
+        const subQuery = qb
+          .subQuery()
+          .select('authority_authorityId')
+          .from(searchTextQuery.getQuery(), 'searchQuery');
+        query.andWhere(`authority.authorityId IN ${subQuery.getQuery()}`);
+      }
+    }
     if (jurisdiction) query.andWhere('source.jurisdiction = :jurisdiction', { jurisdiction });
     if (keywords && keywords.length) {
       // Use sub-query to get list of authorities by ID which match all provided keywords.
@@ -87,9 +104,8 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
         .groupBy('keywords.authorityId')
         .having('COUNT(keywords.authorityId) >= (:totalKeywords)', {
           totalKeywords: keywords.length,
-        })
-        .getQuery();
-      query.andWhere(`authority.authorityId IN ${subQuery}`);
+        });
+      query.andWhere(`authority.authorityId IN ${subQuery.getQuery()}`);
     }
 
     return query.getManyAndCount();
