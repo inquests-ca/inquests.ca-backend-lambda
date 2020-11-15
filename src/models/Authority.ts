@@ -10,6 +10,7 @@ import {
 import { AuthorityDocument } from './AuthorityDocument';
 import { Inquest } from './Inquest';
 import { AuthorityKeyword } from './AuthorityKeyword';
+import { AuthorityTags } from './AuthorityTags';
 
 @Entity('authority')
 export class Authority extends BaseEntity {
@@ -55,6 +56,9 @@ export class Authority extends BaseEntity {
     inverseJoinColumn: { name: 'authorityKeywordId', referencedColumnName: 'authorityKeywordId' },
   })
   authorityKeywords!: AuthorityKeyword[];
+
+  @OneToMany(() => AuthorityTags, (authorityTag) => authorityTag.authority)
+  authorityTags!: AuthorityTags[];
 
   @ManyToMany(() => Authority, (authority) => authority.authorityCitedBy)
   @JoinTable({

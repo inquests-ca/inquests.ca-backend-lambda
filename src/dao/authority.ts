@@ -1,7 +1,7 @@
 import { EntityRepository, AbstractRepository } from 'typeorm';
 
 import { Authority } from '../models/Authority';
-import { escapeRegex } from '../utils/sql';
+import { escapeRegex, getConcatExpression } from '../utils/sql';
 
 @EntityRepository(Authority)
 export class AuthorityRepository extends AbstractRepository<Authority> {
@@ -49,22 +49,51 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
       .addSelect("(jurisdictionCategory.jurisdictionCategoryId = 'CAD')", 'isCanadian') // Used for ordering
       .take(limit)
       .skip(offset)
-      .orderBy('authority.isPrimary', 'DESC')
+      .addOrderBy('authority.isPrimary', 'DESC')
       .addOrderBy('supremeCourt', 'DESC')
       .addOrderBy('isCanadian', 'DESC')
       .addOrderBy('source.rank', 'DESC')
       .addOrderBy('primaryDocument.created', 'DESC');
-    if (text)
-      text.split(/\s+/).forEach((term, i) => {
-        if (term)
-          query.andWhere(
-            `CONCAT(authority.name, ' ', primaryDocument.citation) REGEXP :regexp${i}`,
-            {
-              // Match start of string or non-word character followed by search term.
-              [`regexp${i}`]: `(^|[^A-Za-z0-9])${escapeRegex(term)}`,
-            }
+    if (text) {
+      const terms = text.split(/\s+/).filter((term) => term);
+      if (terms.length) {
+        const searchTextSubQuery = qb
+          .subQuery()
+          .addSelect('authority.authorityId')
+          .addSelect('authority.name')
+          .addSelect('primaryDocument.citation')
+          .from('authority', 'authority')
+          .innerJoin(
+            'authority.authorityDocuments',
+            'primaryDocument',
+            'primaryDocument.isPrimary = 1'
+          )
+          .leftJoin('authority.authorityKeywords', 'keywords')
+          .leftJoin('authority.authorityTags', 'tags')
+          .addGroupBy('authority.authorityId')
+          .addGroupBy('primaryDocument.authorityDocumentId');
+        terms.forEach((term, i) => {
+          // For each search term, ensure at least 1 of several columns contains that term.
+          // Match the start of the string or a non-word character followed by the search term.
+          const regex = `(^|[^A-Za-z0-9])${escapeRegex(term)}`;
+          searchTextSubQuery.andHaving(
+            `${getConcatExpression([
+              'authority.name',
+              'primaryDocument.citation',
+              "GROUP_CONCAT(keywords.name SEPARATOR ' ')",
+              "GROUP_CONCAT(tags.tag SEPARATOR ' ')",
+            ])} REGEXP :regexp${i}`,
+            { [`regexp${i}`]: regex }
           );
-      });
+        });
+        // Extract authority IDs from previous sub-query.
+        const authorityIdSubQuery = qb
+          .subQuery()
+          .select('authority_authorityId')
+          .from(searchTextSubQuery.getQuery(), 'searchTextSubQuery');
+        query.andWhere(`authority.authorityId IN ${authorityIdSubQuery.getQuery()}`);
+      }
+    }
     if (jurisdiction) query.andWhere('source.jurisdiction = :jurisdiction', { jurisdiction });
     if (keywords && keywords.length) {
       // Use sub-query to get list of authorities by ID which match all provided keywords.
@@ -72,13 +101,12 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
         .subQuery()
         .select('keywords.authorityId')
         .from('authorityKeywords', 'keywords')
-        .where('keywords.authorityKeywordId IN (:keywords)')
+        .where('keywords.authorityKeywordId IN (:keywords)', { keywords })
         .groupBy('keywords.authorityId')
-        .having('COUNT(keywords.authorityId) >= (:totalKeywords)')
-        .getQuery();
-      query
-        .andWhere(`authority.authorityId IN ${subQuery}`)
-        .setParameters({ keywords: keywords, totalKeywords: keywords.length });
+        .having('COUNT(keywords.authorityId) >= (:totalKeywords)', {
+          totalKeywords: keywords.length,
+        });
+      query.andWhere(`authority.authorityId IN ${subQuery.getQuery()}`);
     }
 
     return query.getManyAndCount();
