@@ -1,4 +1,4 @@
-import { EntityRepository, AbstractRepository, Brackets } from 'typeorm';
+import { EntityRepository, AbstractRepository } from 'typeorm';
 
 import { Inquest } from '../models/Inquest';
 import { escapeRegex, getConcatExpression } from '../utils/sql';
@@ -48,27 +48,44 @@ export class InquestRepository extends AbstractRepository<Inquest> {
       .orderBy('inquest.isPrimary', 'DESC')
       .addOrderBy('isCanadian', 'DESC')
       .addOrderBy('inquest.start', 'DESC');
-    if (text)
-      text.split(/\s+/).forEach((term, i) => {
-        if (term) {
-          // Match start of string or non-word character followed by search term.
+    if (text) {
+      const terms = text.split(/\s+/).filter((term) => term);
+      if (terms.length) {
+        const searchTextSubQuery = qb
+          .subQuery()
+          .addSelect('inquest.inquestId')
+          .addSelect('inquest.name')
+          .addSelect('deceased.lastName')
+          .addSelect('deceased.givenNames')
+          .from('inquest', 'inquest')
+          .innerJoin('inquest.deceased', 'deceased')
+          .leftJoin('inquest.inquestKeywords', 'keywords')
+          .leftJoin('inquest.inquestTags', 'tags')
+          .addGroupBy('inquest.inquestId')
+          .addGroupBy('deceased.deceasedId');
+        terms.forEach((term, i) => {
+          // For each search term, ensure at least 1 of several columns contains that term.
+          // Match the start of the string or a non-word character followed by each search term.
           const regex = `(^|[^A-Za-z0-9])${escapeRegex(term)}`;
-          query.andWhere(
-            new Brackets((qb) => {
-              qb.where(
-                `${getConcatExpression([
-                  'inquest.name',
-                  'deceased.lastName',
-                  'deceased.givenNames',
-                ])} REGEXP :regexp${i}`
-              )
-                .orWhere(`keywords.name REGEXP :regexp${i}`)
-                .orWhere(`tags.tag REGEXP :regexp${i}`);
-            }),
+          searchTextSubQuery.andHaving(
+            `${getConcatExpression([
+              'inquest.name',
+              'deceased.lastName',
+              'deceased.givenNames',
+              "GROUP_CONCAT(keywords.name SEPARATOR ' ')",
+              "GROUP_CONCAT(tags.tag SEPARATOR ' ')",
+            ])} REGEXP :regexp${i}`,
             { [`regexp${i}`]: regex }
           );
-        }
-      });
+        });
+        // Extract inquest IDs from previous sub-query.
+        const inquestIdSubQuery = qb
+          .subQuery()
+          .select('inquest_inquestId')
+          .from(searchTextSubQuery.getQuery(), 'searchTextSubQuery');
+        query.andWhere(`inquest.inquestId IN ${inquestIdSubQuery.getQuery()}`);
+      }
+    }
     if (jurisdiction)
       query.andWhere('jurisdiction.jurisdictionId = :jurisdiction', { jurisdiction });
     if (keywords && keywords.length) {

@@ -57,7 +57,7 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
     if (text) {
       const terms = text.split(/\s+/).filter((term) => term);
       if (terms.length) {
-        const searchTextQuery = qb
+        const searchTextSubQuery = qb
           .subQuery()
           .addSelect('authority.authorityId')
           .addSelect('authority.name')
@@ -76,7 +76,7 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
           // For each search term, ensure at least 1 of several columns contains that term.
           // Match the start of the string or a non-word character followed by each search term.
           const regex = `(^|[^A-Za-z0-9])${escapeRegex(term)}`;
-          searchTextQuery.andHaving(
+          searchTextSubQuery.andHaving(
             `${getConcatExpression([
               'authority.name',
               'primaryDocument.citation',
@@ -86,11 +86,12 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
             { [`regexp${i}`]: regex }
           );
         });
-        const subQuery = qb
+        // Extract authority IDs from previous sub-query.
+        const authorityIdSubQuery = qb
           .subQuery()
           .select('authority_authorityId')
-          .from(searchTextQuery.getQuery(), 'searchQuery');
-        query.andWhere(`authority.authorityId IN ${subQuery.getQuery()}`);
+          .from(searchTextSubQuery.getQuery(), 'searchTextSubQuery');
+        query.andWhere(`authority.authorityId IN ${authorityIdSubQuery.getQuery()}`);
       }
     }
     if (jurisdiction) query.andWhere('source.jurisdiction = :jurisdiction', { jurisdiction });
