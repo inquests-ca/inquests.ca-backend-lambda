@@ -8,4 +8,4 @@ export const escapeRegex = (term: string): string => term.replace(/[^A-Za-z0-9]/
  * Get MySQL CONCAT_WS expression for the given columns and delimiter.
  */
 export const getConcatExpression = (columns: string[], delimiter = ' '): string =>
-  `CONCAT_WS('${delimiter}', ${columns.join(',')})`;
+  `CONCAT_WS('${delimiter}', ${columns.join(', ')})`;

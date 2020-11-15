@@ -74,7 +74,7 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
           .addGroupBy('primaryDocument.authorityDocumentId');
         terms.forEach((term, i) => {
           // For each search term, ensure at least 1 of several columns contains that term.
-          // Match the start of the string or a non-word character followed by each search term.
+          // Match the start of the string or a non-word character followed by the search term.
           const regex = `(^|[^A-Za-z0-9])${escapeRegex(term)}`;
           searchTextSubQuery.andHaving(
             `${getConcatExpression([

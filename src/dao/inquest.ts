@@ -40,8 +40,6 @@ export class InquestRepository extends AbstractRepository<Inquest> {
       .innerJoinAndSelect('deceased.deathManner', 'deathManner')
       .innerJoinAndSelect('deceased.inquestType', 'inquestType')
       .innerJoin('jurisdiction.jurisdictionCategory', 'jurisdictionCategory')
-      .leftJoin('inquest.inquestKeywords', 'keywords')
-      .leftJoin('inquest.inquestTags', 'tags')
       .addSelect("(jurisdictionCategory.jurisdictionCategoryId = 'CAD')", 'isCanadian') // Used for ordering
       .take(limit)
       .skip(offset)
@@ -65,7 +63,7 @@ export class InquestRepository extends AbstractRepository<Inquest> {
           .addGroupBy('deceased.deceasedId');
         terms.forEach((term, i) => {
           // For each search term, ensure at least 1 of several columns contains that term.
-          // Match the start of the string or a non-word character followed by each search term.
+          // Match the start of the string or a non-word character followed by the search term.
           const regex = `(^|[^A-Za-z0-9])${escapeRegex(term)}`;
           searchTextSubQuery.andHaving(
             `${getConcatExpression([
