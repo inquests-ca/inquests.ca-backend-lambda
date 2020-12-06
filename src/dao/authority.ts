@@ -2,6 +2,7 @@ import { EntityRepository, AbstractRepository } from 'typeorm';
 
 import { Authority } from '../models/Authority';
 import { escapeRegex, getConcatExpression } from '../utils/sql';
+import { AuthoritySort } from '../constants';
 
 @EntityRepository(Authority)
 export class AuthorityRepository extends AbstractRepository<Authority> {
@@ -27,12 +28,14 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
     text,
     keywords,
     jurisdiction,
+    sort,
   }: {
     offset: number;
     limit: number;
     text?: string;
     keywords?: string[];
     jurisdiction?: string;
+    sort?: AuthoritySort;
   }): Promise<[Authority[], number]> {
     // TODO: create userJurisdiction query parameter, use for ordering results.
     const qb = this.createQueryBuilder('authority');
@@ -48,12 +51,7 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
       .addSelect("(source.sourceId = 'CAD_SCC')", 'supremeCourt') // Used for ordering
       .addSelect("(jurisdictionCategory.jurisdictionCategoryId = 'CAD')", 'isCanadian') // Used for ordering
       .take(limit)
-      .skip(offset)
-      .addOrderBy('authority.isPrimary', 'DESC')
-      .addOrderBy('supremeCourt', 'DESC')
-      .addOrderBy('isCanadian', 'DESC')
-      .addOrderBy('source.rank', 'DESC')
-      .addOrderBy('primaryDocument.created', 'DESC');
+      .skip(offset);
     if (text) {
       const terms = text.split(/\s+/).filter((term) => term);
       if (terms.length) {
@@ -107,6 +105,23 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
           totalKeywords: keywords.length,
         });
       query.andWhere(`authority.authorityId IN ${subQuery.getQuery()}`);
+    }
+    switch (sort) {
+      case AuthoritySort.Alphabetical:
+        query.addOrderBy('authority.name', 'ASC');
+        break;
+      case AuthoritySort.Date:
+        query.addOrderBy('primaryDocument.created', 'DESC');
+        break;
+      case AuthoritySort.Relevance:
+        query
+          .addOrderBy('authority.isPrimary', 'DESC')
+          .addOrderBy('supremeCourt', 'DESC')
+          .addOrderBy('isCanadian', 'DESC')
+          .addOrderBy('source.rank', 'DESC')
+          .addOrderBy('primaryDocument.created', 'DESC');
+        break;
+      default:
     }
 
     return query.getManyAndCount();

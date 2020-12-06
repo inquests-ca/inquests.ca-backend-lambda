@@ -2,6 +2,7 @@ import { EntityRepository, AbstractRepository } from 'typeorm';
 
 import { Inquest } from '../models/Inquest';
 import { escapeRegex, getConcatExpression } from '../utils/sql';
+import { InquestSort } from '../constants';
 
 @EntityRepository(Inquest)
 export class InquestRepository extends AbstractRepository<Inquest> {
@@ -25,12 +26,14 @@ export class InquestRepository extends AbstractRepository<Inquest> {
     text,
     keywords,
     jurisdiction,
+    sort,
   }: {
     offset: number;
     limit: number;
     text?: string;
     keywords?: string[];
     jurisdiction?: string;
+    sort?: InquestSort;
   }): Promise<[Inquest[], number]> {
     // TODO: create userJurisdiction query parameter, use for ordering results.
     const qb = this.createQueryBuilder('inquest');
@@ -42,10 +45,7 @@ export class InquestRepository extends AbstractRepository<Inquest> {
       .innerJoin('jurisdiction.jurisdictionCategory', 'jurisdictionCategory')
       .addSelect("(jurisdictionCategory.jurisdictionCategoryId = 'CAD')", 'isCanadian') // Used for ordering
       .take(limit)
-      .skip(offset)
-      .orderBy('inquest.isPrimary', 'DESC')
-      .addOrderBy('isCanadian', 'DESC')
-      .addOrderBy('inquest.start', 'DESC');
+      .skip(offset);
     if (text) {
       const terms = text.split(/\s+/).filter((term) => term);
       if (terms.length) {
@@ -97,6 +97,21 @@ export class InquestRepository extends AbstractRepository<Inquest> {
         .having('COUNT(keywords.inquestId) >= (:totalKeywords)', { totalKeywords: keywords.length })
         .getQuery();
       query.andWhere(`inquest.inquestId IN ${subQuery}`);
+    }
+    switch (sort) {
+      case InquestSort.Alphabetical:
+        query.addOrderBy('inquest.name', 'ASC');
+        break;
+      case InquestSort.Date:
+        query.addOrderBy('inquest.start', 'DESC');
+        break;
+      case InquestSort.Relevance:
+        query
+          .addOrderBy('inquest.isPrimary', 'DESC')
+          .addOrderBy('isCanadian', 'DESC')
+          .addOrderBy('inquest.start', 'DESC');
+        break;
+      default:
     }
 
     return query.getManyAndCount();
