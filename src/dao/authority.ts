@@ -1,4 +1,4 @@
-import { EntityRepository, AbstractRepository } from 'typeorm';
+import { EntityRepository, AbstractRepository, SelectQueryBuilder } from 'typeorm';
 
 import { Authority } from '../models/Authority';
 import { escapeRegex, getConcatExpression } from '../utils/sql';
@@ -38,8 +38,7 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
     sort?: AuthoritySort;
   }): Promise<[Authority[], number]> {
     // TODO: create userJurisdiction query parameter, use for ordering results.
-    const qb = this.createQueryBuilder('authority');
-    const query = qb
+    const query = this.createQueryBuilder('authority')
       .innerJoinAndSelect(
         'authority.authorityDocuments',
         'primaryDocument',
@@ -52,60 +51,71 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
       .addSelect("(jurisdictionCategory.jurisdictionCategoryId = 'CAD')", 'isCanadian') // Used for ordering
       .take(limit)
       .skip(offset);
-    if (text) {
-      const terms = text.split(/\s+/).filter((term) => term);
-      if (terms.length) {
-        const searchTextSubQuery = qb
-          .subQuery()
-          .addSelect('authority.authorityId')
-          .addSelect('authority.name')
-          .addSelect('primaryDocument.citation')
-          .from('authority', 'authority')
-          .innerJoin(
-            'authority.authorityDocuments',
-            'primaryDocument',
-            'primaryDocument.isPrimary = 1'
-          )
-          .leftJoin('authority.authorityKeywords', 'keywords')
-          .leftJoin('authority.authorityTags', 'tags')
-          .addGroupBy('authority.authorityId')
-          .addGroupBy('primaryDocument.authorityDocumentId');
-        terms.forEach((term, i) => {
-          // For each search term, ensure at least 1 of several columns contains that term.
-          // Match the start of the string or a non-word character followed by the search term.
-          const regex = `(^|[^A-Za-z0-9])${escapeRegex(term)}`;
-          searchTextSubQuery.andHaving(
-            `${getConcatExpression([
-              'authority.name',
-              'primaryDocument.citation',
-              "GROUP_CONCAT(keywords.name SEPARATOR ' ')",
-              "GROUP_CONCAT(tags.tag SEPARATOR ' ')",
-            ])} REGEXP :regexp${i}`,
-            { [`regexp${i}`]: regex }
-          );
-        });
-        // Extract authority IDs from previous sub-query.
-        const authorityIdSubQuery = qb
-          .subQuery()
-          .select('authority_authorityId')
-          .from(searchTextSubQuery.getQuery(), 'searchTextSubQuery');
-        query.andWhere(`authority.authorityId IN ${authorityIdSubQuery.getQuery()}`);
-      }
-    }
+
+    if (text) this.addTextSearch(query, text);
+    if (keywords && keywords.length) this.addKeywordSearch(query, keywords);
     if (jurisdiction) query.andWhere('source.jurisdiction = :jurisdiction', { jurisdiction });
-    if (keywords && keywords.length) {
-      // Use sub-query to get list of authorities by ID which match all provided keywords.
-      const subQuery = qb
+    if (sort) this.addSort(query, sort);
+
+    return query.getManyAndCount();
+  }
+
+  private addTextSearch(query: SelectQueryBuilder<Authority>, text: string) {
+    const terms = text.split(/\s+/).filter((term) => term);
+    if (terms.length) {
+      const searchTextSubQuery = query
         .subQuery()
-        .select('keywords.authorityId')
-        .from('authorityKeywords', 'keywords')
-        .where('keywords.authorityKeywordId IN (:keywords)', { keywords })
-        .groupBy('keywords.authorityId')
-        .having('COUNT(keywords.authorityId) >= (:totalKeywords)', {
-          totalKeywords: keywords.length,
-        });
-      query.andWhere(`authority.authorityId IN ${subQuery.getQuery()}`);
+        .addSelect('authority.authorityId')
+        .addSelect('authority.name')
+        .addSelect('primaryDocument.citation')
+        .from('authority', 'authority')
+        .innerJoin(
+          'authority.authorityDocuments',
+          'primaryDocument',
+          'primaryDocument.isPrimary = 1'
+        )
+        .leftJoin('authority.authorityKeywords', 'keywords')
+        .leftJoin('authority.authorityTags', 'tags')
+        .addGroupBy('authority.authorityId')
+        .addGroupBy('primaryDocument.authorityDocumentId');
+      terms.forEach((term, i) => {
+        // For each search term, ensure at least 1 of several columns contains that term.
+        // Match the start of the string or a non-word character followed by the search term.
+        const regex = `(^|[^A-Za-z0-9])${escapeRegex(term)}`;
+        searchTextSubQuery.andHaving(
+          `${getConcatExpression([
+            'authority.name',
+            'primaryDocument.citation',
+            "GROUP_CONCAT(keywords.name SEPARATOR ' ')",
+            "GROUP_CONCAT(tags.tag SEPARATOR ' ')",
+          ])} REGEXP :regexp${i}`,
+          { [`regexp${i}`]: regex }
+        );
+      });
+      // Extract authority IDs from previous sub-query.
+      const authorityIdSubQuery = query
+        .subQuery()
+        .select('authority_authorityId')
+        .from(searchTextSubQuery.getQuery(), 'searchTextSubQuery');
+      query.andWhere(`authority.authorityId IN ${authorityIdSubQuery.getQuery()}`);
     }
+  }
+
+  private addKeywordSearch(query: SelectQueryBuilder<Authority>, keywords: string[]) {
+    // Use sub-query to get list of authorities by ID which match all provided keywords.
+    const subQuery = query
+      .subQuery()
+      .select('keywords.authorityId')
+      .from('authorityKeywords', 'keywords')
+      .where('keywords.authorityKeywordId IN (:keywords)', { keywords })
+      .groupBy('keywords.authorityId')
+      .having('COUNT(keywords.authorityId) >= (:totalKeywords)', {
+        totalKeywords: keywords.length,
+      });
+    query.andWhere(`authority.authorityId IN ${subQuery.getQuery()}`);
+  }
+
+  private addSort(query: SelectQueryBuilder<Authority>, sort: AuthoritySort) {
     switch (sort) {
       case AuthoritySort.Alphabetical:
         query.addOrderBy('authority.name', 'ASC');
@@ -121,9 +131,6 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
           .addOrderBy('source.rank', 'DESC')
           .addOrderBy('primaryDocument.created', 'DESC');
         break;
-      default:
     }
-
-    return query.getManyAndCount();
   }
 }
