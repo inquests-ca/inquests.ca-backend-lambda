@@ -52,6 +52,9 @@ export class InquestRepository extends AbstractRepository<Inquest> {
       query.andWhere('jurisdiction.jurisdictionId = :jurisdiction', { jurisdiction });
     if (sort) this.addSort(query, sort);
 
+    // Ensure ordering of results is deterministic.
+    query.addOrderBy('inquest.inquestId', 'ASC');
+
     return query.getManyAndCount();
   }
 

@@ -55,6 +55,9 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
     if (jurisdiction) query.andWhere('source.jurisdiction = :jurisdiction', { jurisdiction });
     if (sort) this.addSort(query, sort);
 
+    // Ensure ordering of results is deterministic.
+    query.addOrderBy('authority.authorityId', 'ASC');
+
     return query.getManyAndCount();
   }
 
