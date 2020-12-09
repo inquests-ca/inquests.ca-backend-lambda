@@ -20,7 +20,7 @@ router.get('/:authorityId(\\d+)', async (req, res, next) => {
     return;
   }
 
-  const authority = await getCustomRepository(AuthorityRepository).getAuthorityById(query.value);
+  const authority = await getCustomRepository(AuthorityRepository).getAuthorityFromId(query.value);
   if (!authority) {
     next(createError(404, 'Authority not found'));
     return;

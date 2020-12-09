@@ -20,7 +20,7 @@ router.get('/:inquestId(\\d+)', async (req, res, next) => {
     return;
   }
 
-  const inquest = await getCustomRepository(InquestRepository).getInquestById(query.value);
+  const inquest = await getCustomRepository(InquestRepository).getInquestFromId(query.value);
   if (!inquest) {
     next(createError(404, 'Inquest not found'));
     return;

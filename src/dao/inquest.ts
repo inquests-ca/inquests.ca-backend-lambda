@@ -6,7 +6,7 @@ import { Sort } from '../constants';
 
 @EntityRepository(Inquest)
 export class InquestRepository extends AbstractRepository<Inquest> {
-  getInquestById(inquestId: number): Promise<Inquest | undefined> {
+  getInquestFromId(inquestId: number): Promise<Inquest | undefined> {
     return this.createQueryBuilder('inquest')
       .innerJoinAndSelect('inquest.jurisdiction', 'jurisdiction')
       .innerJoinAndSelect('inquest.deceased', 'deceased')

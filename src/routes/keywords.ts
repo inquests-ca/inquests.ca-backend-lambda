@@ -13,7 +13,7 @@ const router = express.Router();
 router.get('/authority', async (_req, res) => {
   const authorityKeywords = await getCustomRepository(
     AuthorityCategoryRepository
-  ).getAuthorityKeywords();
+  ).getAuthorityKeywordsByCategory();
   res.json(authorityKeywords);
 });
 
@@ -22,7 +22,9 @@ router.get('/authority', async (_req, res) => {
  */
 
 router.get('/inquest', async (_req, res) => {
-  const inquestKeywords = await getCustomRepository(InquestCategoryRepository).getInquestKeywords();
+  const inquestKeywords = await getCustomRepository(
+    InquestCategoryRepository
+  ).getInquestKeywordsByCategory();
   res.json(inquestKeywords);
 });
 
