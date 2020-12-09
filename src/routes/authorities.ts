@@ -4,7 +4,7 @@ import createError from 'http-errors';
 import { getCustomRepository } from 'typeorm';
 
 import { AuthorityRepository } from '../dao/authority';
-import { PAGINATION } from '../constants';
+import { Sort, PAGINATION } from '../constants';
 
 const router = express.Router();
 
@@ -32,18 +32,23 @@ router.get('/:authorityId(\\d+)', async (req, res, next) => {
  * Get authorities with optional search parameters and pagination.
  */
 
+// TODO: remove typing since it does nothing.
+// TODO: add authority query type.
+// TODO: remove unknown keys.
 const authorityQueryValidation = joi.object<{
   offset: number;
   limit: number;
   text?: string;
   keywords?: string[];
   jurisdiction?: string;
+  sort?: Sort;
 }>({
   offset: joi.number().integer().min(0).default(0),
   limit: joi.number().integer().positive().default(PAGINATION),
   text: joi.string(),
   keywords: joi.array(),
   jurisdiction: joi.string(),
+  sort: joi.string().valid(...Object.values(Sort)),
 });
 router.get('/', async (req, res, next) => {
   const query = authorityQueryValidation.validate(req.query);
@@ -52,13 +57,14 @@ router.get('/', async (req, res, next) => {
     return;
   }
 
-  const { offset, limit, text, keywords, jurisdiction } = query.value;
+  const { offset, limit, text, keywords, jurisdiction, sort } = query.value;
   const [data, count] = await getCustomRepository(AuthorityRepository).getAuthorities({
     offset,
     limit,
     text,
     keywords,
     jurisdiction,
+    sort,
   });
   res.json({ data, count });
 });

@@ -4,7 +4,7 @@ import createError from 'http-errors';
 import { getCustomRepository } from 'typeorm';
 
 import { InquestRepository } from '../dao/inquest';
-import { PAGINATION } from '../constants';
+import { Sort, PAGINATION } from '../constants';
 
 const router = express.Router();
 
@@ -38,12 +38,14 @@ const inquestQueryValidation = joi.object<{
   text?: string;
   keywords?: string[];
   jurisdiction?: string;
+  sort?: Sort;
 }>({
   offset: joi.number().integer().min(0).default(0),
   limit: joi.number().integer().positive().default(PAGINATION),
   text: joi.string(),
   keywords: joi.array(),
   jurisdiction: joi.string(),
+  sort: joi.string().valid(...Object.values(Sort)),
 });
 router.get('/', async (req, res, next) => {
   const query = inquestQueryValidation.validate(req.query);
@@ -52,13 +54,14 @@ router.get('/', async (req, res, next) => {
     return;
   }
 
-  const { offset, limit, text, keywords, jurisdiction } = query.value;
+  const { offset, limit, text, keywords, jurisdiction, sort } = query.value;
   const [data, count] = await getCustomRepository(InquestRepository).getInquests({
     offset,
     limit,
     text,
     keywords,
     jurisdiction,
+    sort,
   });
   res.json({ data, count });
 });
