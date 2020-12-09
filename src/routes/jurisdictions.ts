@@ -1,7 +1,7 @@
 import express from 'express';
 import { getCustomRepository } from 'typeorm';
 
-import { JurisdictionCategoryRepository } from '../dao/jurisdictionCategory';
+import { JurisdictionRepository } from '../dao/jurisdiction';
 
 const router = express.Router();
 
@@ -11,8 +11,8 @@ const router = express.Router();
 
 router.get('/', async (_req, res) => {
   const jurisdictions = await getCustomRepository(
-    JurisdictionCategoryRepository
-  ).getJurisdictionsByCategory();
+    JurisdictionRepository
+  ).getJurisdictionsByCountry();
   res.json(jurisdictions);
 });
 

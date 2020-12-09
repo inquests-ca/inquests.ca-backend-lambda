@@ -1,5 +1,12 @@
-import { Column, Entity, BaseEntity, ManyToOne, JoinColumn, PrimaryColumn } from 'typeorm';
-import { JurisdictionCategory } from './JurisdictionCategory';
+import {
+  Column,
+  Entity,
+  BaseEntity,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+  PrimaryColumn,
+} from 'typeorm';
 
 @Entity('jurisdiction')
 export class Jurisdiction extends BaseEntity {
@@ -7,7 +14,7 @@ export class Jurisdiction extends BaseEntity {
   jurisdictionId!: string;
 
   @Column('char', { length: 100 })
-  jurisdictionCategoryId!: string;
+  federalJurisdictionId!: string;
 
   @Column('varchar', { length: 255 })
   name!: string;
@@ -15,10 +22,10 @@ export class Jurisdiction extends BaseEntity {
   @Column('varchar', { length: 255 })
   code!: string;
 
-  @Column('tinyint', { unsigned: true })
-  isFederal!: boolean;
+  @ManyToOne(() => Jurisdiction)
+  @JoinColumn({ name: 'federalJurisdictionId', referencedColumnName: 'jurisdictionId' })
+  federalJurisdiction!: Jurisdiction;
 
-  @ManyToOne(() => JurisdictionCategory)
-  @JoinColumn({ name: 'jurisdictionCategoryId', referencedColumnName: 'jurisdictionCategoryId' })
-  jurisdictionCategory!: JurisdictionCategory;
+  @OneToMany(() => Jurisdiction, (jurisdiction) => jurisdiction.federalJurisdiction)
+  jurisdictions!: Jurisdiction[];
 }
