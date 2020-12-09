@@ -2,7 +2,7 @@ import { EntityRepository, AbstractRepository, SelectQueryBuilder } from 'typeor
 
 import { Authority } from '../models/Authority';
 import { escapeRegex, getConcatExpression } from '../utils/sql';
-import { AuthoritySort } from '../constants';
+import { Sort } from '../constants';
 
 @EntityRepository(Authority)
 export class AuthorityRepository extends AbstractRepository<Authority> {
@@ -35,7 +35,7 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
     text?: string;
     keywords?: string[];
     jurisdiction?: string;
-    sort?: AuthoritySort;
+    sort?: Sort;
   }): Promise<[Authority[], number]> {
     // TODO: create userJurisdiction query parameter, use for ordering results.
     const query = this.createQueryBuilder('authority')
@@ -116,15 +116,15 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
     query.andWhere(`authority.authorityId IN ${subQuery.getQuery()}`);
   }
 
-  private addSort(query: SelectQueryBuilder<Authority>, sort: AuthoritySort) {
+  private addSort(query: SelectQueryBuilder<Authority>, sort: Sort) {
     switch (sort) {
-      case AuthoritySort.Alphabetical:
+      case Sort.Alphabetical:
         query.addOrderBy('authority.name', 'ASC');
         break;
-      case AuthoritySort.Date:
+      case Sort.New:
         query.addOrderBy('primaryDocument.created', 'DESC');
         break;
-      case AuthoritySort.Relevance:
+      case Sort.Relevant:
         query
           .addOrderBy('authority.isPrimary', 'DESC')
           .addOrderBy('source.rank', 'DESC')

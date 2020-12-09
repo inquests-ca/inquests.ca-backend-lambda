@@ -2,7 +2,7 @@ import { EntityRepository, AbstractRepository, SelectQueryBuilder } from 'typeor
 
 import { Inquest } from '../models/Inquest';
 import { escapeRegex, getConcatExpression } from '../utils/sql';
-import { InquestSort } from '../constants';
+import { Sort } from '../constants';
 
 @EntityRepository(Inquest)
 export class InquestRepository extends AbstractRepository<Inquest> {
@@ -33,7 +33,7 @@ export class InquestRepository extends AbstractRepository<Inquest> {
     text?: string;
     keywords?: string[];
     jurisdiction?: string;
-    sort?: InquestSort;
+    sort?: Sort;
   }): Promise<[Inquest[], number]> {
     // TODO: create userJurisdiction query parameter, use for ordering results.
     const query = this.createQueryBuilder('inquest')
@@ -110,15 +110,15 @@ export class InquestRepository extends AbstractRepository<Inquest> {
     query.andWhere(`inquest.inquestId IN ${subQuery}`);
   }
 
-  private addSort(query: SelectQueryBuilder<Inquest>, sort: InquestSort) {
+  private addSort(query: SelectQueryBuilder<Inquest>, sort: Sort) {
     switch (sort) {
-      case InquestSort.Alphabetical:
+      case Sort.Alphabetical:
         query.addOrderBy('inquest.name', 'ASC');
         break;
-      case InquestSort.Date:
+      case Sort.New:
         query.addOrderBy('inquest.start', 'DESC');
         break;
-      case InquestSort.Relevance:
+      case Sort.Relevant:
         query
           .addOrderBy('inquest.isPrimary', 'DESC')
           .addOrderBy('isCanadian', 'DESC')
