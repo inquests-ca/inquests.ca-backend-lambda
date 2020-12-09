@@ -34,6 +34,7 @@ router.get('/:authorityId(\\d+)', async (req, res, next) => {
 
 // TODO: remove typing since it does nothing.
 // TODO: add authority query type.
+// TODO: remove unknown keys.
 const authorityQueryValidation = joi.object<{
   offset: number;
   limit: number;

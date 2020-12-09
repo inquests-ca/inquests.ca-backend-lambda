@@ -42,7 +42,6 @@ export class InquestRepository extends AbstractRepository<Inquest> {
       .innerJoinAndSelect('deceased.deathManner', 'deathManner')
       .innerJoinAndSelect('deceased.inquestType', 'inquestType')
       .innerJoin('jurisdiction.jurisdictionCategory', 'jurisdictionCategory')
-      .addSelect("(jurisdictionCategory.jurisdictionCategoryId = 'CAD')", 'isCanadian') // Used for ordering
       .take(limit)
       .skip(offset);
 
@@ -120,6 +119,7 @@ export class InquestRepository extends AbstractRepository<Inquest> {
         break;
       case Sort.Relevant:
         query
+          .addSelect("(jurisdictionCategory.jurisdictionCategoryId = 'CAD')", 'isCanadian')
           .addOrderBy('inquest.isPrimary', 'DESC')
           .addOrderBy('isCanadian', 'DESC')
           .addOrderBy('inquest.start', 'DESC');
