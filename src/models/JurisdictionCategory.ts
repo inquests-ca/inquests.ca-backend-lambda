@@ -1,4 +1,6 @@
-import { Column, Entity, BaseEntity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, BaseEntity, PrimaryColumn, OneToMany } from 'typeorm';
+
+import { Jurisdiction } from './Jurisdiction';
 
 @Entity('jurisdictionCategory')
 export class JurisdictionCategory extends BaseEntity {
@@ -7,4 +9,7 @@ export class JurisdictionCategory extends BaseEntity {
 
   @Column('varchar', { length: 255 })
   name!: string;
+
+  @OneToMany(() => Jurisdiction, (jurisdiction) => jurisdiction.jurisdictionCategory)
+  jurisdictions!: Jurisdiction[];
 }

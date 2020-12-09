@@ -4,6 +4,7 @@ import morgan from 'morgan';
 
 import authoritiesRouter from './routes/authorities';
 import inquestsRouter from './routes/inquests';
+import jurisdictionsRouter from './routes/jurisdictions';
 import keywordsRouter from './routes/keywords';
 
 const app = express();
@@ -20,6 +21,7 @@ app.use((req, res, next) => {
 
 app.use('/authorities', authoritiesRouter);
 app.use('/inquests', inquestsRouter);
+app.use('/jurisdictions', jurisdictionsRouter);
 app.use('/keywords', keywordsRouter);
 
 // Catch 404 and forward to error handler.
