@@ -10,9 +10,7 @@ const router = express.Router();
  */
 
 router.get('/', async (_req, res) => {
-  const jurisdictions = await getCustomRepository(
-    JurisdictionRepository
-  ).getJurisdictionsByCountry();
+  const jurisdictions = await getCustomRepository(JurisdictionRepository).getJurisdictions();
   res.json(jurisdictions);
 });
 
