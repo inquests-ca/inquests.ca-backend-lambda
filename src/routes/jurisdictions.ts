@@ -6,7 +6,7 @@ import { JurisdictionRepository } from '../dao/jurisdiction';
 const router = express.Router();
 
 /**
- * Get all jurisdictions, grouped by category (Canada, US, UK, etc.).
+ * Get all jurisdictions.
  */
 
 router.get('/', async (_req, res) => {
