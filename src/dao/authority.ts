@@ -1,4 +1,4 @@
-import { EntityRepository, AbstractRepository, SelectQueryBuilder } from 'typeorm';
+import { EntityRepository, AbstractRepository, SelectQueryBuilder, Brackets } from 'typeorm';
 
 import { Authority } from '../models/Authority';
 import { escapeRegex, getConcatExpression } from '../utils/sql';
@@ -6,7 +6,7 @@ import { Sort } from '../constants';
 
 @EntityRepository(Authority)
 export class AuthorityRepository extends AbstractRepository<Authority> {
-  getAuthorityById(authorityId: number): Promise<Authority | undefined> {
+  getAuthorityFromId(authorityId: number): Promise<Authority | undefined> {
     return this.createQueryBuilder('authority')
       .innerJoinAndSelect('authority.authorityDocuments', 'documents')
       .innerJoinAndSelect('documents.source', 'source')
@@ -46,13 +46,12 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
       )
       .innerJoinAndSelect('primaryDocument.source', 'source')
       .leftJoin('source.jurisdiction', 'jurisdiction')
-      .innerJoin('jurisdiction.jurisdictionCategory', 'jurisdictionCategory')
       .take(limit)
       .skip(offset);
 
     if (text) this.addTextSearch(query, text);
     if (keywords && keywords.length) this.addKeywordSearch(query, keywords);
-    if (jurisdiction) query.andWhere('source.jurisdiction = :jurisdiction', { jurisdiction });
+    if (jurisdiction) this.addJurisdictionSearch(query, jurisdiction);
     if (sort) this.addSort(query, sort);
 
     // Ensure ordering of results is deterministic.
@@ -114,6 +113,25 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
         totalKeywords: keywords.length,
       });
     query.andWhere(`authority.authorityId IN ${subQuery.getQuery()}`);
+  }
+
+  private addJurisdictionSearch(query: SelectQueryBuilder<Authority>, jurisdiction: string) {
+    // Get the federal jurisdiction of the given jurisdiction.
+    const subQuery = query
+      .subQuery()
+      .select('jurisdiction.federalJurisdictionId')
+      .from('jurisdiction', 'jurisdiction')
+      .where('jurisdiction.jurisdictionId = :jurisdiction', { jurisdiction })
+      .limit(1);
+    query.andWhere(
+      new Brackets((qb) => {
+        // Select authorities where the authority's primary document jurisdiction either matches
+        // the given jurisdiction or is the federal jurisdiction of the given jurisdiction.
+        return qb
+          .where('jurisdiction.jurisdictionId = :jurisdiction', { jurisdiction })
+          .orWhere(`jurisdiction.jurisdictionId = ${subQuery.getQuery()}`);
+      })
+    );
   }
 
   private addSort(query: SelectQueryBuilder<Authority>, sort: Sort) {
