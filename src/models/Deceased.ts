@@ -17,6 +17,9 @@ export class Deceased extends BaseEntity {
   @Column('char', { length: 100 })
   deathMannerId!: string;
 
+  @Column('char', { length: 100 })
+  deathCauseId!: string;
+
   @Column('varchar', { length: 255 })
   deathCause!: string;
 
