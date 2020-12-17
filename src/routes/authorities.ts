@@ -5,6 +5,7 @@ import { getCustomRepository } from 'typeorm';
 
 import { AuthorityRepository } from '../dao/authority';
 import { authorityQuerySchema } from '../utils/query';
+import { validate } from '../utils/validate';
 
 const router = express.Router();
 
@@ -33,13 +34,13 @@ router.get('/:authorityId(\\d+)', async (req, res, next) => {
  */
 
 router.get('/', async (req, res, next) => {
-  const query = authorityQuerySchema.validate(req.query, { stripUnknown: true });
-  if (query.error) {
+  const query = validate(authorityQuerySchema, req.query);
+  if (!query) {
     next(createError(400));
     return;
   }
 
-  const [data, count] = await getCustomRepository(AuthorityRepository).getAuthorities(query.value);
+  const [data, count] = await getCustomRepository(AuthorityRepository).getAuthorities(query);
   res.json({ data, count });
 });
 

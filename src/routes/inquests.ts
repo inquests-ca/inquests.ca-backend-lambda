@@ -5,6 +5,7 @@ import { getCustomRepository } from 'typeorm';
 
 import { InquestRepository } from '../dao/inquest';
 import { inquestQuerySchema } from '../utils/query';
+import { validate } from '../utils/validate';
 
 const router = express.Router();
 
@@ -33,13 +34,13 @@ router.get('/:inquestId(\\d+)', async (req, res, next) => {
  */
 
 router.get('/', async (req, res, next) => {
-  const query = inquestQuerySchema.validate(req.query);
-  if (query.error) {
+  const query = validate(inquestQuerySchema, req.query);
+  if (!query) {
     next(createError(400));
     return;
   }
 
-  const [data, count] = await getCustomRepository(InquestRepository).getInquests(query.value);
+  const [data, count] = await getCustomRepository(InquestRepository).getInquests(query);
   res.json({ data, count });
 });
 
