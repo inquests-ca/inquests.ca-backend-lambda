@@ -26,6 +26,7 @@ export class InquestRepository extends AbstractRepository<Inquest> {
     text,
     keywords,
     jurisdiction,
+    deathCause,
     sort,
   }: InquestQuery): Promise<[Inquest[], number]> {
     // TODO: create userJurisdiction query parameter, use for ordering results.
@@ -41,6 +42,7 @@ export class InquestRepository extends AbstractRepository<Inquest> {
     if (keywords && keywords.length) this.addKeywordSearch(query, keywords);
     if (jurisdiction)
       query.andWhere('jurisdiction.jurisdictionId = :jurisdiction', { jurisdiction });
+    if (deathCause) query.andWhere('deceased.deathCauseId = :deathCause', { deathCause });
     if (sort) this.addSort(query, sort);
 
     // Ensure ordering of results is deterministic.

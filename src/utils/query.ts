@@ -29,5 +29,9 @@ const baseQuerySchema = joi.object<BaseQuery>({
 export type AuthorityQuery = BaseQuery;
 export const authorityQuerySchema = baseQuerySchema;
 
-export type InquestQuery = BaseQuery;
-export const inquestQuerySchema = baseQuerySchema;
+export interface InquestQuery extends BaseQuery {
+  deathCause: string;
+}
+export const inquestQuerySchema = (baseQuerySchema as joi.ObjectSchema<InquestQuery>).keys({
+  deathCause: joi.string(),
+});
