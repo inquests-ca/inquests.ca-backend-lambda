@@ -4,7 +4,7 @@ import createError from 'http-errors';
 import { getCustomRepository } from 'typeorm';
 
 import { InquestRepository } from '../dao/inquest';
-import { Sort, PAGINATION } from '../constants';
+import { inquestQuerySchema } from '../utils/query';
 
 const router = express.Router();
 
@@ -12,8 +12,8 @@ const router = express.Router();
  * Get inquest by ID.
  */
 
-const inquestIdValidation = joi.number().integer().positive().required();
 router.get('/:inquestId(\\d+)', async (req, res, next) => {
+  const inquestIdValidation = joi.number().integer().positive().required();
   const query = inquestIdValidation.validate(req.params.inquestId);
   if (query.error) {
     next(createError(400));
@@ -32,37 +32,14 @@ router.get('/:inquestId(\\d+)', async (req, res, next) => {
  * Get inquests with optional search parameters and pagination.
  */
 
-const inquestQueryValidation = joi.object<{
-  offset: number;
-  limit: number;
-  text?: string;
-  keywords?: string[];
-  jurisdiction?: string;
-  sort?: Sort;
-}>({
-  offset: joi.number().integer().min(0).default(0),
-  limit: joi.number().integer().positive().default(PAGINATION),
-  text: joi.string(),
-  keywords: joi.array(),
-  jurisdiction: joi.string(),
-  sort: joi.string().valid(...Object.values(Sort)),
-});
 router.get('/', async (req, res, next) => {
-  const query = inquestQueryValidation.validate(req.query);
+  const query = inquestQuerySchema.validate(req.query);
   if (query.error) {
     next(createError(400));
     return;
   }
 
-  const { offset, limit, text, keywords, jurisdiction, sort } = query.value;
-  const [data, count] = await getCustomRepository(InquestRepository).getInquests({
-    offset,
-    limit,
-    text,
-    keywords,
-    jurisdiction,
-    sort,
-  });
+  const [data, count] = await getCustomRepository(InquestRepository).getInquests(query.value);
   res.json({ data, count });
 });
 

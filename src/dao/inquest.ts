@@ -2,7 +2,7 @@ import { EntityRepository, AbstractRepository, SelectQueryBuilder } from 'typeor
 
 import { Inquest } from '../models/Inquest';
 import { escapeRegex, getConcatExpression } from '../utils/sql';
-import { Sort } from '../constants';
+import { InquestQuery, Sort } from '../utils/query';
 
 @EntityRepository(Inquest)
 export class InquestRepository extends AbstractRepository<Inquest> {
@@ -27,14 +27,7 @@ export class InquestRepository extends AbstractRepository<Inquest> {
     keywords,
     jurisdiction,
     sort,
-  }: {
-    offset: number;
-    limit: number;
-    text?: string;
-    keywords?: string[];
-    jurisdiction?: string;
-    sort?: Sort;
-  }): Promise<[Inquest[], number]> {
+  }: InquestQuery): Promise<[Inquest[], number]> {
     // TODO: create userJurisdiction query parameter, use for ordering results.
     const query = this.createQueryBuilder('inquest')
       .innerJoinAndSelect('inquest.jurisdiction', 'jurisdiction')
