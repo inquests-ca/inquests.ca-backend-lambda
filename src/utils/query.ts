@@ -1,7 +1,5 @@
 import joi from 'joi';
 
-export const PAGINATION = 12;
-
 export enum Sort {
   Relevant = 'relevant',
   New = 'new',
@@ -19,7 +17,7 @@ interface BaseQuery {
 
 const baseQuerySchema = joi.object<BaseQuery>({
   offset: joi.number().integer().min(0).default(0),
-  limit: joi.number().integer().positive().default(PAGINATION),
+  limit: joi.number().integer().positive().max(2000).default(100),
   text: joi.string(),
   keywords: joi.array(),
   jurisdiction: joi.string(),
