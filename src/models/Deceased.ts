@@ -1,4 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, BaseEntity } from 'typeorm';
+
+import { DeathCause } from './DeathCause';
 import { DeathManner } from './DeathManner';
 import { Inquest } from './Inquest';
 import { InquestType } from './InquestType';
@@ -41,6 +43,10 @@ export class Deceased extends BaseEntity {
   @ManyToOne(() => DeathManner)
   @JoinColumn({ name: 'deathMannerId', referencedColumnName: 'deathMannerId' })
   deathManner!: DeathManner;
+
+  @ManyToOne(() => DeathCause)
+  @JoinColumn({ name: 'deathCauseId', referencedColumnName: 'deathCauseId' })
+  deathCauseModel!: DeathCause;
 
   @ManyToOne(() => Inquest, (inquest) => inquest.deceased)
   @JoinColumn({ name: 'inquestId', referencedColumnName: 'inquestId' })

@@ -60,8 +60,10 @@ export class InquestRepository extends AbstractRepository<Inquest> {
         .addSelect('inquest.name')
         .addSelect('deceased.lastName')
         .addSelect('deceased.givenNames')
+        .addSelect('deathCause.name')
         .from('inquest', 'inquest')
         .innerJoin('inquest.deceased', 'deceased')
+        .innerJoin('deceased.deathCauseModel', 'deathCause')
         .leftJoin('inquest.inquestKeywords', 'keywords')
         .leftJoin('inquest.inquestTags', 'tags')
         .addGroupBy('inquest.inquestId')
@@ -75,6 +77,7 @@ export class InquestRepository extends AbstractRepository<Inquest> {
             'inquest.name',
             'deceased.lastName',
             'deceased.givenNames',
+            'deathCause.name',
             "GROUP_CONCAT(keywords.name SEPARATOR ' ')",
             "GROUP_CONCAT(tags.tag SEPARATOR ' ')",
           ])} REGEXP :regexp${i}`,
