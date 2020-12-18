@@ -2,7 +2,7 @@ import { EntityRepository, AbstractRepository, SelectQueryBuilder, Brackets } fr
 
 import { Authority } from '../models/Authority';
 import { escapeRegex, getConcatExpression } from '../utils/sql';
-import { Sort } from '../constants';
+import { AuthorityQuery, Sort } from '../utils/query';
 
 @EntityRepository(Authority)
 export class AuthorityRepository extends AbstractRepository<Authority> {
@@ -29,14 +29,7 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
     keywords,
     jurisdiction,
     sort,
-  }: {
-    offset: number;
-    limit: number;
-    text?: string;
-    keywords?: string[];
-    jurisdiction?: string;
-    sort?: Sort;
-  }): Promise<[Authority[], number]> {
+  }: AuthorityQuery): Promise<[Authority[], number]> {
     // TODO: create userJurisdiction query parameter, use for ordering results.
     const query = this.createQueryBuilder('authority')
       .innerJoinAndSelect(

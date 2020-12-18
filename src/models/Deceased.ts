@@ -1,4 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, BaseEntity } from 'typeorm';
+
+import { DeathCause } from './DeathCause';
 import { DeathManner } from './DeathManner';
 import { Inquest } from './Inquest';
 import { InquestType } from './InquestType';
@@ -16,6 +18,9 @@ export class Deceased extends BaseEntity {
 
   @Column('char', { length: 100 })
   deathMannerId!: string;
+
+  @Column('char', { length: 100 })
+  deathCauseId!: string;
 
   @Column('varchar', { length: 255 })
   deathCause!: string;
@@ -38,6 +43,10 @@ export class Deceased extends BaseEntity {
   @ManyToOne(() => DeathManner)
   @JoinColumn({ name: 'deathMannerId', referencedColumnName: 'deathMannerId' })
   deathManner!: DeathManner;
+
+  @ManyToOne(() => DeathCause)
+  @JoinColumn({ name: 'deathCauseId', referencedColumnName: 'deathCauseId' })
+  deathCauseModel!: DeathCause;
 
   @ManyToOne(() => Inquest, (inquest) => inquest.deceased)
   @JoinColumn({ name: 'inquestId', referencedColumnName: 'inquestId' })

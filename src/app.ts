@@ -6,6 +6,7 @@ import authoritiesRouter from './routes/authorities';
 import inquestsRouter from './routes/inquests';
 import jurisdictionsRouter from './routes/jurisdictions';
 import keywordsRouter from './routes/keywords';
+import deathCausesRouter from './routes/deathCauses';
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use('/authorities', authoritiesRouter);
 app.use('/inquests', inquestsRouter);
 app.use('/jurisdictions', jurisdictionsRouter);
 app.use('/keywords', keywordsRouter);
+app.use('/deathCauses', deathCausesRouter);
 
 // Catch 404 and forward to error handler.
 app.use((_req, _res, next) => {

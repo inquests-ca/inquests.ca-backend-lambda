@@ -1,8 +1,8 @@
 import express from 'express';
-import { getCustomRepository } from 'typeorm';
+import { getRepository } from 'typeorm';
 
-import { AuthorityCategoryRepository } from '../dao/authorityCategory';
-import { InquestCategoryRepository } from '../dao/inquestCategory';
+import { AuthorityCategory } from '../models/AuthorityCategory';
+import { InquestCategory } from '../models/InquestCategory';
 
 const router = express.Router();
 
@@ -11,9 +11,9 @@ const router = express.Router();
  */
 
 router.get('/authority', async (_req, res) => {
-  const authorityKeywords = await getCustomRepository(
-    AuthorityCategoryRepository
-  ).getAuthorityKeywordsByCategory();
+  const authorityKeywords = await getRepository(AuthorityCategory).find({
+    relations: ['authorityKeywords'],
+  });
   res.json(authorityKeywords);
 });
 
@@ -22,9 +22,9 @@ router.get('/authority', async (_req, res) => {
  */
 
 router.get('/inquest', async (_req, res) => {
-  const inquestKeywords = await getCustomRepository(
-    InquestCategoryRepository
-  ).getInquestKeywordsByCategory();
+  const inquestKeywords = await getRepository(InquestCategory).find({
+    relations: ['inquestKeywords'],
+  });
   res.json(inquestKeywords);
 });
 

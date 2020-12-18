@@ -2,7 +2,7 @@ import { EntityRepository, AbstractRepository, SelectQueryBuilder } from 'typeor
 
 import { Inquest } from '../models/Inquest';
 import { escapeRegex, getConcatExpression } from '../utils/sql';
-import { Sort } from '../constants';
+import { InquestQuery, Sort } from '../utils/query';
 
 @EntityRepository(Inquest)
 export class InquestRepository extends AbstractRepository<Inquest> {
@@ -26,15 +26,9 @@ export class InquestRepository extends AbstractRepository<Inquest> {
     text,
     keywords,
     jurisdiction,
+    deathCause,
     sort,
-  }: {
-    offset: number;
-    limit: number;
-    text?: string;
-    keywords?: string[];
-    jurisdiction?: string;
-    sort?: Sort;
-  }): Promise<[Inquest[], number]> {
+  }: InquestQuery): Promise<[Inquest[], number]> {
     // TODO: create userJurisdiction query parameter, use for ordering results.
     const query = this.createQueryBuilder('inquest')
       .innerJoinAndSelect('inquest.jurisdiction', 'jurisdiction')
@@ -48,6 +42,7 @@ export class InquestRepository extends AbstractRepository<Inquest> {
     if (keywords && keywords.length) this.addKeywordSearch(query, keywords);
     if (jurisdiction)
       query.andWhere('jurisdiction.jurisdictionId = :jurisdiction', { jurisdiction });
+    if (deathCause) query.andWhere('deceased.deathCauseId = :deathCause', { deathCause });
     if (sort) this.addSort(query, sort);
 
     // Ensure ordering of results is deterministic.
@@ -65,8 +60,10 @@ export class InquestRepository extends AbstractRepository<Inquest> {
         .addSelect('inquest.name')
         .addSelect('deceased.lastName')
         .addSelect('deceased.givenNames')
+        .addSelect('deathCause.name')
         .from('inquest', 'inquest')
         .innerJoin('inquest.deceased', 'deceased')
+        .innerJoin('deceased.deathCauseModel', 'deathCause')
         .leftJoin('inquest.inquestKeywords', 'keywords')
         .leftJoin('inquest.inquestTags', 'tags')
         .addGroupBy('inquest.inquestId')
@@ -80,6 +77,7 @@ export class InquestRepository extends AbstractRepository<Inquest> {
             'inquest.name',
             'deceased.lastName',
             'deceased.givenNames',
+            'deathCause.name',
             "GROUP_CONCAT(keywords.name SEPARATOR ' ')",
             "GROUP_CONCAT(tags.tag SEPARATOR ' ')",
           ])} REGEXP :regexp${i}`,
