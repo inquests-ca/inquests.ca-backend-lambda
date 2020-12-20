@@ -1,4 +1,4 @@
-import { EntityRepository, AbstractRepository, SelectQueryBuilder, Brackets } from 'typeorm';
+import { EntityRepository, AbstractRepository, SelectQueryBuilder } from 'typeorm';
 
 import { Authority } from '../models/Authority';
 import { escapeRegex, getConcatExpression } from '../utils/sql';
@@ -38,7 +38,6 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
         'primaryDocument.isPrimary = 1'
       )
       .innerJoinAndSelect('primaryDocument.source', 'source')
-      .leftJoin('source.jurisdiction', 'jurisdiction')
       .take(limit)
       .skip(offset);
 
@@ -109,22 +108,16 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
   }
 
   private addJurisdictionSearch(query: SelectQueryBuilder<Authority>, jurisdiction: string) {
-    // Get the federal jurisdiction of the given jurisdiction.
-    const subQuery = query
-      .subQuery()
-      .select('jurisdiction.federalJurisdictionId')
-      .from('jurisdiction', 'jurisdiction')
-      .where('jurisdiction.jurisdictionId = :jurisdiction', { jurisdiction })
-      .limit(1);
-    query.andWhere(
-      new Brackets((qb) => {
-        // Select authorities where the authority's primary document jurisdiction either matches
-        // the given jurisdiction or is the federal jurisdiction of the given jurisdiction.
-        return qb
-          .where('jurisdiction.jurisdictionId = :jurisdiction', { jurisdiction })
-          .orWhere(`jurisdiction.jurisdictionId = ${subQuery.getQuery()}`);
-      })
-    );
+    query.andWhere((qb) => {
+      const subQuery = qb
+        .subQuery()
+        .select('authority.authorityId')
+        .from('authority', 'authority')
+        .innerJoin('authority.authorityDocuments', 'documents')
+        .innerJoin('documents.source', 'source')
+        .where('source.jurisdictionId = :jurisdiction', { jurisdiction });
+      return `authority.authorityId IN ${subQuery.getQuery()}`;
+    });
   }
 
   private addSort(query: SelectQueryBuilder<Authority>, sort: Sort) {
