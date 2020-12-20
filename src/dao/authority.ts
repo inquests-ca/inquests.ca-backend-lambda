@@ -38,7 +38,6 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
         'primaryDocument.isPrimary = 1'
       )
       .innerJoinAndSelect('primaryDocument.source', 'source')
-      .leftJoin('source.jurisdiction', 'jurisdiction')
       .take(limit)
       .skip(offset);
 
