@@ -65,6 +65,7 @@ export class InquestRepository extends AbstractRepository<Inquest> {
         .innerJoin('inquest.deceased', 'deceased')
         .innerJoin('deceased.deathCauseModel', 'deathCause')
         .leftJoin('inquest.inquestKeywords', 'keywords')
+        .leftJoin('keywords.inquestKeywordSynonyms', 'synonyms')
         .leftJoin('inquest.inquestTags', 'tags')
         .addGroupBy('inquest.inquestId')
         .addGroupBy('deceased.deceasedId');
@@ -79,6 +80,7 @@ export class InquestRepository extends AbstractRepository<Inquest> {
             'deceased.givenNames',
             'deathCause.name',
             "GROUP_CONCAT(keywords.name SEPARATOR ' ')",
+            "GROUP_CONCAT(synonyms.synonym SEPARATOR ' ')",
             "GROUP_CONCAT(tags.tag SEPARATOR ' ')",
           ])} REGEXP :regexp${i}`,
           { [`regexp${i}`]: regex }

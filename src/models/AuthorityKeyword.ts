@@ -1,5 +1,15 @@
-import { Column, Entity, JoinColumn, ManyToOne, BaseEntity, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  BaseEntity,
+  PrimaryColumn,
+  OneToMany,
+} from 'typeorm';
+
 import { AuthorityCategory } from './AuthorityCategory';
+import { AuthorityKeywordSynonyms } from './AuthorityKeywordSynonyms';
 
 @Entity('authorityKeyword')
 export class AuthorityKeyword extends BaseEntity {
@@ -18,4 +28,10 @@ export class AuthorityKeyword extends BaseEntity {
   @ManyToOne(() => AuthorityCategory, (authorityCategory) => authorityCategory.authorityKeywords)
   @JoinColumn({ name: 'authorityCategoryId', referencedColumnName: 'authorityCategoryId' })
   authorityCategory!: AuthorityCategory;
+
+  @OneToMany(
+    () => AuthorityKeywordSynonyms,
+    (AuthorityKeywordSynonyms) => AuthorityKeywordSynonyms.authorityKeyword
+  )
+  authorityKeywordSynonyms!: AuthorityKeywordSynonyms[];
 }

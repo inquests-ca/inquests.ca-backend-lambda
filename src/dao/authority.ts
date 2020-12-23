@@ -67,6 +67,7 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
           'primaryDocument.isPrimary = 1'
         )
         .leftJoin('authority.authorityKeywords', 'keywords')
+        .leftJoin('keywords.authorityKeywordSynonyms', 'synonyms')
         .leftJoin('authority.authorityTags', 'tags')
         .addGroupBy('authority.authorityId')
         .addGroupBy('primaryDocument.authorityDocumentId');
@@ -79,6 +80,7 @@ export class AuthorityRepository extends AbstractRepository<Authority> {
             'authority.name',
             'primaryDocument.citation',
             "GROUP_CONCAT(keywords.name SEPARATOR ' ')",
+            "GROUP_CONCAT(synonyms.synonym SEPARATOR ' ')",
             "GROUP_CONCAT(tags.tag SEPARATOR ' ')",
           ])} REGEXP :regexp${i}`,
           { [`regexp${i}`]: regex }

@@ -1,5 +1,15 @@
-import { Column, Entity, JoinColumn, ManyToOne, BaseEntity, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  BaseEntity,
+  PrimaryColumn,
+  OneToMany,
+} from 'typeorm';
+
 import { InquestCategory } from './InquestCategory';
+import { InquestKeywordSynonyms } from './InquestKeywordSynonyms';
 
 @Entity('inquestKeyword')
 export class InquestKeyword extends BaseEntity {
@@ -18,4 +28,10 @@ export class InquestKeyword extends BaseEntity {
   @ManyToOne(() => InquestCategory, (inquestCategory) => inquestCategory.inquestKeywords)
   @JoinColumn({ name: 'inquestCategoryId', referencedColumnName: 'inquestCategoryId' })
   inquestCategory!: InquestCategory;
+
+  @OneToMany(
+    () => InquestKeywordSynonyms,
+    (InquestKeywordSynonyms) => InquestKeywordSynonyms.inquestKeyword
+  )
+  inquestKeywordSynonyms!: InquestKeywordSynonyms[];
 }
